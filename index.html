@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mustapha NIAMANE | Architecte Logiciel & Développeur Full Stack</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description"
+        content="Portfolio de Mustapha NIAMANE, Développeur Full Stack & Backend spécialisé Laravel, architectures monolithes modulaires et solutions scalables.">
+    <meta name="keywords"
+        content="Mustapha NIAMANE, Développeur Web, Full Stack, Laravel, PHP, Backend, Paris, France, Monolithe Modulaire, React, Portfolio">
+
+    <!-- Google Fonts: Plus Jakarta Sans & Space Grotesk -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- FontAwesome pour les icônes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Indicateur de défilement (Scroll Progress) -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+
+    <!-- Canvas pour l'arrière-plan de particules -->
+    <canvas id="particleCanvas"></canvas>
+
+    <!-- Navbar -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo">MN<span>.</span></a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#about" class="nav-item" data-i18n="nav-about">À propos</a></li>
+                <li><a href="#skills" class="nav-item" data-i18n="nav-skills">Compétences</a></li>
+                <li><a href="#experience" class="nav-item" data-i18n="nav-experience">Parcours</a></li>
+                <li><a href="#projects" class="nav-item" data-i18n="nav-projects">Projets</a></li>
+                <li><a href="#gallery" class="nav-item" data-i18n="nav-gallery">Média Gallery</a></li>
+                <li><a href="#contact" class="nav-item" data-i18n="nav-contact">Contact</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button id="langToggle" class="lang-toggle-btn" title="Switch to English" data-lang="fr">
+                    <span class="flag-icon">
+                        <svg class="flag-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 30">
+                            <clipPath id="flag-uk-a"><path d="M0,0 v30 h60 v-30 z"/></clipPath>
+                            <clipPath id="flag-uk-b"><path d="M30,15 L0,0 L0,30 z"/></clipPath>
+                            <clipPath id="flag-uk-c"><path d="M30,15 L60,0 L60,30 z"/></clipPath>
+                            <g clip-path="url(#flag-uk-a)">
+                                <path d="M0,0 h60 v30 h-60 z" fill="#012169"/>
+                                <path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" stroke-width="6"/>
+                                <path d="M0,0 L60,30" stroke="#C8102E" stroke-width="4" clip-path="url(#flag-uk-b)"/>
+                                <path d="M60,0 L0,30" stroke="#C8102E" stroke-width="4" clip-path="url(#flag-uk-c)"/>
+                                <path d="M0,15 H60 M30,0 V30" stroke="#fff" stroke-width="10"/>
+                                <path d="M0,15 H60 M30,0 V30" stroke="#C8102E" stroke-width="6"/>
+                            </g>
+                        </svg>
+                    </span>
+                </button>
+                <button id="themeToggle" class="theme-toggle-btn" title="Changer de thème">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <div class="menu-toggle" id="mobile-menu">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero" id="hero">
+        <div class="hero-mesh-background"></div>
+
+        <div class="hero-container">
+            <div class="hero-content scroll-reveal" data-anim="fade-right">
+                <div class="badge" data-i18n="hero-badge">Disponible pour opportunités</div>
+                <h1><span data-i18n="hero-greeting">Bonjour, je suis</span> <br><span class="highlight">Mustapha NIAMANE</span></h1>
+                <h2 class="typing-text-container">
+                    <span class="typewriter" id="typewriter"></span><span class="cursor">|</span>
+                </h2>
+                <p data-i18n="hero-subtitle">Spécialisé dans la conception d'architectures robustes (Monolithes Modulaires), l'optimisation des performances et le développement backend de haut niveau.</p>
+                <div class="hero-buttons">
+                    <a href="#projects" class="btn btn-primary"><i class="fas fa-briefcase"></i> <span data-i18n="hero-btn-projects">Explorer mes projets</span></a>
+                    <a href="#contact" class="btn btn-outline"><i class="fas fa-envelope"></i> <span data-i18n="hero-btn-contact">Me contacter</span></a>
+                </div>
+            </div>
+
+            <!-- Profile Photo in Hero -->
+            <div class="hero-profile scroll-reveal" data-anim="fade-left">
+                <div class="profile-frame">
+                    <img src="profile_upright.jpg?v=2" alt="Mustapha NIAMANE" class="profile-img">
+                    <div class="glowing-border"></div>
+                    <div class="tech-dots">
+                        <span class="dot-item php" title="PHP"><i class="fab fa-php"></i></span>
+                        <span class="dot-item laravel" title="Laravel"><i class="fab fa-laravel"></i></span>
+                        <span class="dot-item js" title="JavaScript"><i class="fab fa-js"></i></span>
+                        <span class="dot-item react" title="React"><i class="fab fa-react"></i></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <a href="#about" class="scroll-down" aria-label="Défiler vers le bas">
+            <div class="mouse">
+                <div class="wheel"></div>
+            </div>
+        </a>
+    </header>
+
+    <!-- About Section -->
+    <section id="about" class="section">
+        <h2 class="section-title scroll-reveal" data-anim="fade-up" data-i18n="about-title">À propos de moi</h2>
+        <div class="about-container">
+            <div class="about-text scroll-reveal" data-anim="fade-right">
+                <h3 data-i18n="about-subtitle">Développeur & Architecte passionné</h3>
+                <p data-i18n="about-p1">Développeur Full Stack passionné, je me spécialise dans la création d'architectures logicielles
+                    modernes, performantes et scalables. Mon parcours m'a permis d'acquérir une solide
+                    expertise sur les technologies du web, de la gestion de bases de données à la mise en place de
+                    structures complexes de type <strong>Monolithe Modulaire</strong> et d'approches de migration comme
+                    le <strong>Strangler Pattern</strong>.</p>
+                <p data-i18n="about-p2">Rigoureux et autonome, j'aime résoudre des problèmes techniques complexes, optimiser le code existant
+                    et automatiser les workflows pour offrir la meilleure expérience utilisateur et développeur
+                    possible.</p>
+
+                <div class="personal-info-grid">
+                    <div class="info-item" data-i18n="about-info-loc"><strong>Localisation:</strong> Paris, France</div>
+                    <div class="info-item" data-i18n="about-info-email"><strong>Email:</strong> mustaphaniamane@gmail.com</div>
+                    <div class="info-item" data-i18n="about-info-phone"><strong>Téléphone:</strong> +33 7 45 14 95 04</div>
+                    <div class="info-item" data-i18n="about-info-spec"><strong>Spécialité:</strong> Laravel, PHP, Backend</div>
+                </div>
+            </div>
+
+            <div class="about-stats scroll-reveal" data-anim="fade-left">
+                <div class="stat-card">
+                    <div class="stat-number" data-target="3">0</div>
+                    <p data-i18n="about-stat-exp">Années d'expérience</p>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" data-target="15">0</div>
+                    <p data-i18n="about-stat-projects">Projets Réalisés</p>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" data-target="100">0</div>
+                    <p data-i18n="about-stat-passion">% Passion & Rigueur</p>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" data-target="80">0</div>
+                    <p data-i18n="about-stat-speed">Optimisation Vitesse %</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section id="skills" class="section bg-light">
+        <h2 class="section-title scroll-reveal" data-anim="fade-up" data-i18n="skills-title">Expertises & Compétences</h2>
+        <div class="skills-grid">
+            <div class="skill-card scroll-reveal" data-anim="fade-up" data-delay="100">
+                <div class="skill-icon-wrapper">
+                    <i class="fab fa-php skill-icon"></i>
+                </div>
+                <h3 data-i18n="skills-card1-title">Backend & API</h3>
+                <p data-i18n="skills-card1-desc">PHP, Laravel, API RESTful, Modélisation MVC & Domain Driven Design.</p>
+                <div class="skill-progress">
+                    <div class="progress-bar" style="width: 90%"></div>
+                </div>
+            </div>
+            <div class="skill-card scroll-reveal" data-anim="fade-up" data-delay="200">
+                <div class="skill-icon-wrapper">
+                    <i class="fab fa-js skill-icon"></i>
+                </div>
+                <h3 data-i18n="skills-card2-title">Frontend & UI</h3>
+                <p data-i18n="skills-card2-desc">JavaScript (ES6+), React.js, Tailwind CSS, HTML5, CSS3 Modernes.</p>
+                <div class="skill-progress">
+                    <div class="progress-bar" style="width: 80%"></div>
+                </div>
+            </div>
+            <div class="skill-card scroll-reveal" data-anim="fade-up" data-delay="300">
+                <div class="skill-icon-wrapper">
+                    <i class="fas fa-database skill-icon"></i>
+                </div>
+                <h3 data-i18n="skills-card3-title">Bases de données</h3>
+                <p data-i18n="skills-card3-desc">SQL, MySQL, MongoDB. Optimisation de requêtes complexes et d'indexation.</p>
+                <div class="skill-progress">
+                    <div class="progress-bar" style="width: 85%"></div>
+                </div>
+            </div>
+            <div class="skill-card scroll-reveal" data-anim="fade-up" data-delay="400">
+                <div class="skill-icon-wrapper">
+                    <i class="fas fa-tools skill-icon"></i>
+                </div>
+                <h3 data-i18n="skills-card4-title">Outils & DevOps</h3>
+                <p data-i18n="skills-card4-desc">Git, GitHub, Docker, Linux Administration, CI/CD, Méthodes Agiles Scrum.</p>
+                <div class="skill-progress">
+                    <div class="progress-bar" style="width: 85%"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Experience Section -->
+    <section id="experience" class="section">
+        <h2 class="section-title scroll-reveal" data-anim="fade-up" data-i18n="exp-title">Parcours & Expériences</h2>
+        <div class="timeline">
+            <div class="timeline-item scroll-reveal" data-anim="fade-left">
+                <div class="timeline-dot"></div>
+                <div class="timeline-date" data-i18n="exp-job1-date">Juin 2026 - Août 2026</div>
+                <div class="timeline-content">
+                    <h3 data-i18n="exp-job1-title">Développeur Backend</h3>
+                    <h4>InnovQube (Paris)</h4>
+                    <p data-i18n="exp-job1-desc">Contribution active aux plateformes SaaS <strong>InnovGuide</strong> et
+                        <strong>InnovRental</strong>. Diagnostic, troubleshooting approfondi et résolution de bugs
+                        complexes sur l'environnement de staging.
+                    </p>
+                </div>
+            </div>
+            <div class="timeline-item scroll-reveal" data-anim="fade-right">
+                <div class="timeline-dot"></div>
+                <div class="timeline-date" data-i18n="exp-job2-date">2026</div>
+                <div class="timeline-content">
+                    <h3 data-i18n="exp-job2-title">Développeur Full Stack</h3>
+                    <h4>ERAH</h4>
+                    <p data-i18n="exp-job2-desc">Planification et développement d'une architecture <strong>Monolithe Modulaire</strong>.
+                        Conception complète des modules <strong>Wallet</strong> et <strong>Gamification</strong>, et
+                        implémentation progressive du <strong>Strangler Pattern</strong> pour migrer les fonctionnalités
+                        legacy.</p>
+                </div>
+            </div>
+            <div class="timeline-item scroll-reveal" data-anim="fade-left">
+                <div class="timeline-dot"></div>
+                <div class="timeline-date" data-i18n="exp-job3-date">2024</div>
+                <div class="timeline-content">
+                    <h3 data-i18n="exp-job3-title">Développeur Full Stack (Stage)</h3>
+                    <h4>Taousse Business Consulting Services</h4>
+                    <p data-i18n="exp-job3-desc">Conception et développement de la plateforme e-commerce <strong>E-Biblio</strong>. Modélisation
+                        complète d'API REST et développement du back-office de gestion.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="section bg-light">
+        <h2 class="section-title scroll-reveal" data-anim="fade-up" data-i18n="proj-title">Mes Projets Récents</h2>
+
+        <div class="projects-grid">
+            <!-- Projet 1: E-Biblio -->
+            <div class="project-card scroll-reveal" data-project="ebiblio" data-anim="fade-up" data-delay="100">
+                <div class="project-image-wrapper">
+                    <img src="ebiblio_mockup.png" alt="E-Biblio Mockup" class="project-card-image">
+                    <div class="project-hover-overlay">
+                        <span class="view-details-btn"><i class="fas fa-search-plus"></i> <span data-i18n="proj-view">Voir le projet</span></span>
+                    </div>
+                </div>
+                <div class="project-info">
+                    <h3 data-i18n="proj-card1-title">E-Biblio (Fourniscolaire)</h3>
+                    <p data-i18n="proj-card1-desc">Site e-commerce destiné à une franchise de bibliothèques pour la vente en ligne de fournitures
+                        scolaires. Comprend la gestion complète du catalogue et du back-office.</p>
+                    <div class="project-tags">
+                        <span class="tech-tag">React</span>
+                        <span class="tech-tag">Laravel</span>
+                        <span class="tech-tag">MySQL</span>
+                    </div>
+                    <a href="https://fourniscolaire.ma/en/" target="_blank" class="project-link"><i
+                            class="fas fa-external-link-alt"></i> <span data-i18n="proj-visit">Visiter le site</span></a>
+                </div>
+            </div>
+
+            <!-- Projet 2: Module de Recrutement -->
+            <div class="project-card scroll-reveal" data-project="recruitment" data-anim="fade-up" data-delay="200">
+                <div class="project-image-wrapper">
+                    <img src="recruitment_mockup.png" alt="OFPPT Recruitment Mockup" class="project-card-image">
+                    <div class="project-hover-overlay">
+                        <span class="view-details-btn"><i class="fas fa-search-plus"></i> <span data-i18n="proj-view">Voir le projet</span></span>
+                    </div>
+                </div>
+                <div class="project-info">
+                    <h3 data-i18n="proj-card2-title">Module de Recrutement</h3>
+                    <p data-i18n="proj-card2-desc">Plateforme complète de publication d'offres d'emploi et de traitement automatisé des candidatures
+                        développée pour l'OFPPT.</p>
+                    <div class="project-tags">
+                        <span class="tech-tag">Laravel</span>
+                        <span class="tech-tag">React</span>
+                        <span class="tech-tag">API REST</span>
+                    </div>
+                    <a href="https://github.com/NIAMANE-Mustapha/OFPPT_RECRUTE-.git" target="_blank"
+                        class="project-link"><i class="fab fa-github"></i> <span data-i18n="proj-github">Voir le dépôt GitHub</span></a>
+                </div>
+            </div>
+
+            <!-- Projet 3: Solution Energy Consulting -->
+            <div class="project-card scroll-reveal" data-project="energy" data-anim="fade-up" data-delay="300">
+                <div class="project-image-wrapper">
+                    <img src="energy_mockup.png" alt="Solution Energy Consulting Mockup" class="project-card-image">
+                    <div class="project-hover-overlay">
+                        <span class="view-details-btn"><i class="fas fa-search-plus"></i> <span data-i18n="proj-view">Voir le projet</span></span>
+                    </div>
+                </div>
+                <div class="project-info">
+                    <h3 data-i18n="proj-card3-title">Solution Energy Consulting</h3>
+                    <p data-i18n="proj-card3-desc">Plateforme vitrine et de services pour votre partenaire de confiance en audits énergétiques et
+                        solutions solaires.</p>
+                    <div class="project-tags">
+                        <span class="tech-tag">HTML5 / CSS3</span>
+                        <span class="tech-tag">JavaScript</span>
+                    </div>
+                    <a href="https://solutionenergyconsulting.ma/" target="_blank" class="project-link"><i
+                            class="fas fa-external-link-alt"></i> <span data-i18n="proj-visit">Visiter le site</span></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="more-projects-container scroll-reveal" data-anim="fade-up">
+            <a href="https://github.com/NIAMANE-Mustapha" target="_blank" class="btn btn-more">
+                <i class="fab fa-github"></i> <span data-i18n="proj-more">En savoir plus sur GitHub</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- Gallery & Media Showcase Section -->
+    <section id="gallery" class="section">
+        <h2 class="section-title scroll-reveal" data-anim="fade-up" data-i18n="gal-title">Galerie Média & Architecture</h2>
+        <p class="section-subtitle scroll-reveal" data-anim="fade-up" data-i18n="gal-subtitle"
+            style="text-align: center; margin-top: -30px; margin-bottom: 40px; color: var(--text-color);">
+            Aperçu de mes environnements de travail, architectures de bases de données et démonstrations interactives.
+        </p>
+
+        <!-- Filtres de la Galerie -->
+        <div class="gallery-filters scroll-reveal" data-anim="fade-up">
+            <button class="filter-btn active" data-filter="all" data-i18n="gal-filter-all">Tous</button>
+            <button class="filter-btn" data-filter="architecture" data-i18n="gal-filter-arch">Architecture & Data</button>
+            <button class="filter-btn" data-filter="workspace" data-i18n="gal-filter-code">Environnement & Code</button>
+            <button class="filter-btn" data-filter="agile" data-i18n="gal-filter-agile">Gestion de Projet (Scrum)</button>
+        </div>
+
+        <div class="gallery-grid scroll-reveal" data-anim="fade-up" data-delay="100">
+
+            <!-- Item 1: Interactive System Architecture Diagram (Laravel Monolith) -->
+            <div class="gallery-item-card" data-category="architecture">
+                <div class="card-media-header">
+                    <span class="media-badge"><i class="fas fa-project-diagram"></i> <span data-i18n="gal-card1-badge">Architecture Logicielle</span></span>
+
+                    <!-- Diagramme SVG Interactif -->
+                    <div class="interactive-diagram">
+                        <svg viewBox="0 0 400 240" class="sys-architecture-svg">
+                            <rect x="10" y="80" width="100" height="50" rx="8" class="arch-node monolith" />
+                            <text x="60" y="110" class="arch-text font-bold">Monolithe</text>
+
+                            <rect x="150" y="20" width="100" height="50" rx="8" class="arch-node module" />
+                            <text x="200" y="50" class="arch-text">Auth Mod.</text>
+
+                            <rect x="150" y="90" width="100" height="50" rx="8" class="arch-node module highlighted" />
+                            <text x="200" y="120" class="arch-text">Wallet Mod.</text>
+
+                            <rect x="150" y="160" width="100" height="50" rx="8" class="arch-node module" />
+                            <text x="200" y="190" class="arch-text">Gamification</text>
+
+                            <rect x="290" y="90" width="100" height="50" rx="8" class="arch-node database" />
+                            <text x="340" y="120" class="arch-text">MySQL DB</text>
+
+                            <!-- Connexions -->
+                            <path d="M 110 105 L 150 45" class="connector-line" />
+                            <path d="M 110 105 L 150 115" class="connector-line pulse" />
+                            <path d="M 110 105 L 150 185" class="connector-line" />
+                            <path d="M 250 115 L 290 115" class="connector-line" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="gallery-item-info">
+                    <h4 data-i18n="gal-card1-title">Monolithe Modulaire</h4>
+                    <p data-i18n="gal-card1-desc">Visualisation interactive de la structure modulaire implémentée chez ERAH. Les modules
+                        interagissent de manière découplée avec une base de données MySQL unifiée.</p>
+                </div>
+            </div>
+
+            <!-- Item 2: Coding Loop Video -->
+            <div class="gallery-item-card" data-category="workspace">
+                <div class="card-media-header">
+                    <span class="media-badge"><i class="fas fa-video"></i> <span data-i18n="gal-card2-badge">Vidéo Code</span></span>
+                    <!-- Simulated Live Terminal Widget -->
+                    <div class="terminal-sim">
+                        <div class="terminal-header">
+                            <span class="term-dot close"></span>
+                            <span class="term-dot minimize"></span>
+                            <span class="term-dot maximize"></span>
+                            <span class="terminal-title">phpunit --testdox</span>
+                        </div>
+                        <div class="terminal-body">
+                            <div class="term-line"><span class="term-prompt">$</span> phpunit tests/Feature/WalletTest</div>
+                            <div class="term-line success">✓ wallet balance initializes at zero</div>
+                            <div class="term-line success">✓ wallet deposit adds balance</div>
+                            <div class="term-line success">✓ wallet withdraw deducts balance</div>
+                            <div class="term-line success">✓ wallet transfer handles concurrency</div>
+                            <div class="term-line info">Tests: 4 passed, 4 assertions (0.24s)</div>
+                            <div class="term-line cursor-line"><span class="term-prompt">$</span> <span class="term-cursor">_</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="gallery-item-info">
+                    <h4 data-i18n="gal-card2-title">Programmation & Tests</h4>
+                    <p data-i18n="gal-card2-desc">Démonstration en temps réel d'exécution de tests unitaires PHPUnit et de requêtes d'optimisation
+                        backend.</p>
+                </div>
+            </div>
+
+            <!-- Item 3: Workspace image (Unsplash) -->
+            <div class="gallery-item-card" data-category="workspace">
+                <div class="card-media-header">
+                    <span class="media-badge"><i class="fas fa-image"></i> <span data-i18n="gal-card3-badge">Workspace</span></span>
+                    <img src="https://images.unsplash.com/photo-1605379399642-870262d3d051?auto=format&fit=crop&w=600&q=80"
+                        alt="Workspace Mustapha" class="gallery-image">
+                </div>
+                <div class="gallery-item-info">
+                    <h4 data-i18n="gal-card3-title">Environnement Linux / Git</h4>
+                    <p data-i18n="gal-card3-desc">Développement quotidien sous Linux avec Git en CLI pour un suivi précis des branches et versions
+                        de déploiement.</p>
+                </div>
+            </div>
+
+            <!-- Item 4: Interactive Agile Scrum Board -->
+            <div class="gallery-item-card" data-category="agile">
+                <div class="card-media-header">
+                    <span class="media-badge"><i class="fas fa-tasks"></i> <span data-i18n="gal-card4-badge">Kanban Interactif</span></span>
+
+                    <!-- Board Kanban Miniature -->
+                    <div class="kanban-miniature">
+                        <div class="kanban-column">
+                            <h5 data-i18n="gal-kanban-todo">À faire</h5>
+                            <div class="kanban-card">Design API</div>
+                        </div>
+                        <div class="kanban-column">
+                            <h5 data-i18n="gal-kanban-doing">En cours</h5>
+                            <div class="kanban-card coding">Optimisation DB</div>
+                        </div>
+                        <div class="kanban-column">
+                            <h5 data-i18n="gal-kanban-done">Fait</h5>
+                            <div class="kanban-card done">Wallet Mod.</div>
+                            <div class="kanban-card done">CI/CD Pipeline</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="gallery-item-info">
+                    <h4 data-i18n="gal-card4-title">Méthodologie Scrum</h4>
+                    <p data-i18n="gal-card4-desc">Gestion de projet agile avec Jira/Trello pour planifier les sprints, attribuer les tâches et
+                        suivre l'avancement.</p>
+                </div>
+            </div>
+
+            <!-- Item 5: Database Schema representation -->
+            <div class="gallery-item-card" data-category="architecture">
+                <div class="card-media-header">
+                    <span class="media-badge"><i class="fas fa-database"></i> <span data-i18n="gal-card5-badge">Modélisation Base de données</span></span>
+
+                    <!-- Table Schema CSS -->
+                    <div class="db-schema-visual">
+                        <div class="db-table">
+                            <div class="db-table-header"><i class="fas fa-table"></i> users</div>
+                            <div class="db-table-row"><span>id</span> <span class="db-type">BIGINT [PK]</span></div>
+                            <div class="db-table-row"><span>email</span> <span class="db-type">VARCHAR</span></div>
+                            <div class="db-table-row"><span>password</span> <span class="db-type">VARCHAR</span></div>
+                        </div>
+                        <div class="db-relation-arrow">
+                            <i class="fas fa-long-arrow-alt-right"></i>
+                        </div>
+                        <div class="db-table">
+                            <div class="db-table-header"><i class="fas fa-table"></i> wallets</div>
+                            <div class="db-table-row"><span>id</span> <span class="db-type">BIGINT [PK]</span></div>
+                            <div class="db-table-row"><span>user_id</span> <span class="db-type">BIGINT [FK]</span>
+                            </div>
+                            <div class="db-table-row"><span>balance</span> <span class="db-type">DECIMAL</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="gallery-item-info">
+                    <h4 data-i18n="gal-card5-title">Conception SQL / MySQL</h4>
+                    <p data-i18n="gal-card5-desc">Indexation rigoureuse et relations de clés étrangères pour garantir la cohérence des données
+                        transactionnelles.</p>
+                </div>
+            </div>
+
+            <!-- Item 6: Git Flow looping video -->
+            <div class="gallery-item-card" data-category="workspace">
+                <div class="card-media-header">
+                    <span class="media-badge"><i class="fas fa-video"></i> <span data-i18n="gal-card6-badge">Git Workflow</span></span>
+                    <!-- Simulated Git Flow SVG Widget -->
+                    <div class="git-sim">
+                        <svg viewBox="0 0 400 160" class="git-flow-svg">
+                            <line x1="40" y1="35" x2="360" y2="35" class="git-branch main-branch" />
+                            <line x1="40" y1="80" x2="320" y2="80" class="git-branch dev-branch" />
+                            <line x1="120" y1="125" x2="260" y2="125" class="git-branch feature-branch" />
+                            
+                            <path d="M 40 35 Q 80 80 120 80" class="git-connector" />
+                            <path d="M 120 80 Q 160 125 200 125" class="git-connector" />
+                            <path d="M 260 125 Q 290 80 320 80" class="git-connector" />
+                            <path d="M 320 80 Q 340 35 360 35" class="git-connector" />
+                            
+                            <circle cx="50" cy="35" r="6" class="git-commit main-commit" />
+                            <circle cx="120" cy="80" r="5" class="git-commit dev-commit" />
+                            <circle cx="190" cy="125" r="5" class="git-commit feature-commit pulse-node" />
+                            <circle cx="250" cy="125" r="5" class="git-commit feature-commit" />
+                            <circle cx="310" cy="80" r="5" class="git-commit dev-commit" />
+                            <circle cx="350" cy="35" r="6" class="git-commit main-commit" />
+                            
+                            <text x="30" y="20" class="git-text">main</text>
+                            <text x="30" y="95" class="git-text">develop</text>
+                            <text x="110" y="140" class="git-text">feature/wallet</text>
+                        </svg>
+                    </div>
+                </div>
+                <div class="gallery-item-info">
+                    <h4 data-i18n="gal-card6-title">Branches & Git Flow</h4>
+                    <p data-i18n="gal-card6-desc">Utilisation avancée de Git (rebases, interactive staging et commits atomiques) pour des revues de
+                        code fluides.</p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Modal pour les Détails du Projet -->
+    <div id="projectModal" class="modal">
+        <span class="close-modal">&times;</span>
+        <div class="modal-content">
+            <div class="modal-body-container">
+                <div class="modal-left">
+                    <img id="modalImg" src="" alt="Project mockup">
+                </div>
+                <div class="modal-right">
+                    <h3 id="modalTitle">Project Title</h3>
+                    <p id="modalDescription">Detailed description...</p>
+                    <div id="modalTags" class="project-tags"></div>
+                    <a id="modalLink" href="" target="_blank" class="btn btn-primary" data-i18n="modal-visit">Visiter / En savoir plus</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Section -->
+    <section id="contact" class="section">
+        <h2 class="section-title scroll-reveal" data-anim="fade-up" data-i18n="contact-title">Me Contacter</h2>
+        <div class="contact-container">
+            <form class="contact-form scroll-reveal" id="contactForm" data-anim="fade-right">
+                <div class="form-group">
+                    <input type="text" id="name" required placeholder=" ">
+                    <label for="name" data-i18n="contact-name">Votre nom</label>
+                </div>
+                <div class="form-group">
+                    <input type="email" id="email" required placeholder=" ">
+                    <label for="email" data-i18n="contact-email">Votre adresse email</label>
+                </div>
+                <div class="form-group">
+                    <textarea id="message" rows="5" required placeholder=" "></textarea>
+                    <label for="message" data-i18n="contact-message">Votre message</label>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <span class="btn-text" data-i18n="contact-btn">Envoyer le message</span>
+                    <span class="btn-icon"><i class="fas fa-paper-plane"></i></span>
+                </button>
+            </form>
+
+            <div class="contact-info scroll-reveal" id="contactInfo" data-anim="fade-left">
+                <h3 data-i18n="contact-info-title">Coordonnées</h3>
+                <p data-i18n="contact-info-desc">N'hésitez pas à me contacter pour toute opportunité de collaboration, mission freelance ou échange
+                    technique.</p>
+
+                <div class="contact-details">
+                    <div class="contact-detail-item">
+                        <i class="fas fa-envelope"></i>
+                        <div>
+                            <h4 data-i18n="contact-label-email">Email</h4>
+                            <p><a href="mailto:mustaphaniamane@gmail.com">mustaphaniamane@gmail.com</a></p>
+                        </div>
+                    </div>
+                    <div class="contact-detail-item">
+                        <i class="fas fa-phone"></i>
+                        <div>
+                            <h4 data-i18n="contact-label-phone">Téléphone</h4>
+                            <p><a href="tel:+33745149504">+33 7 45 14 95 04</a></p>
+                        </div>
+                    </div>
+                    <div class="contact-detail-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div>
+                            <h4 data-i18n="contact-label-loc">Localisation</h4>
+                            <p>Paris, France</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="social-icons">
+                    <a href="https://www.linkedin.com/in/mustapha-niamane" target="_blank" aria-label="LinkedIn"><i
+                            class="fab fa-linkedin"></i></a>
+                    <a href="https://github.com/NIAMANE-Mustapha" target="_blank" aria-label="GitHub"><i
+                            class="fab fa-github"></i></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <p data-i18n="footer-text">&copy; 2026 Mustapha NIAMANE. Conçu avec passion, optimisé pour la performance.</p>
+            <a href="#hero" class="back-to-top" id="backToTop" aria-label="Retour en haut de page"><i
+                    class="fas fa-arrow-up"></i></a>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>  class="fas fa-arrow-up"></i></a>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
