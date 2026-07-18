@@ -6,7 +6,7 @@ on:
       - main
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -16,9 +16,6 @@ concurrency:
 
 jobs:
   deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -29,21 +26,20 @@ jobs:
         with:
           node-version: 22
           cache: 'npm'
+          cache-dependency-path: portfolio-src/package-lock.json
 
       - name: Install dependencies
         run: npm ci
+        working-directory: portfolio-src
 
       - name: Build
         run: npm run build
+        working-directory: portfolio-src
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-
-      - name: Upload Artifacts
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: './dist'
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Commit built files to main branch root
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add index.html assets/ -f
+          git diff --staged --quiet || git commit -m "ci: update compiled assets [skip ci]"
+          git push origin main
