@@ -714,12 +714,12 @@ const App = () => {
                 <h2 className="section-title">{translations[lang]["exp-title"]}</h2>
                 <div className="timeline">
                     {[
-                        { date: translations[lang]["exp-job1-date"], title: translations[lang]["exp-job1-title"], comp: "InnovQube (Paris)", desc: translations[lang]["exp-job1-desc"], anim: "fade-left" },
-                        { date: translations[lang]["exp-job2-date"], title: translations[lang]["exp-job2-title"], comp: "ERAH", desc: translations[lang]["exp-job2-desc"], anim: "fade-right" },
-                        { date: translations[lang]["exp-job3-date"], title: translations[lang]["exp-job3-title"], comp: "Taousse Business Consulting", desc: translations[lang]["exp-job3-desc"], anim: "fade-left" }
+                        { date: translations[lang]["exp-job1-date"], title: translations[lang]["exp-job1-title"], comp: "InnovQube (Paris)", desc: translations[lang]["exp-job1-desc"], anim: "fade-left", side: "right" },
+                        { date: translations[lang]["exp-job2-date"], title: translations[lang]["exp-job2-title"], comp: "ERAH", desc: translations[lang]["exp-job2-desc"], anim: "fade-right", side: "left" },
+                        { date: translations[lang]["exp-job3-date"], title: translations[lang]["exp-job3-title"], comp: "Taousse Business Consulting", desc: translations[lang]["exp-job3-desc"], anim: "fade-left", side: "right" }
                     ].map((exp, index) => (
                         <ScrollReveal key={index} anim={exp.anim}>
-                            <div className="timeline-item">
+                            <div className={`timeline-item timeline-${exp.side || "right"}`}>
                                 <div className="timeline-dot"></div>
                                 <div className="timeline-date">{exp.date}</div>
                                 <div className="timeline-content">
