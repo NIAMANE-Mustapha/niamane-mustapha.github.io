@@ -11,6 +11,24 @@
         content="Portfolio de Mustapha NIAMANE, Développeur Full Stack & Backend spécialisé Laravel, architectures monolithes modulaires et solutions scalables.">
     <meta name="keywords"
         content="Mustapha NIAMANE, Développeur Web, Full Stack, Laravel, PHP, Backend, Paris, France, Monolithe Modulaire, React, Portfolio">
+    <link rel="canonical" href="https://mustaphaniamane.com/">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mustaphaniamane.com/">
+    <meta property="og:title" content="Mustapha NIAMANE | Architecte Logiciel & Développeur Full Stack">
+    <meta property="og:description" content="Développeur Full Stack & Backend spécialisé Laravel, architectures monolithes modulaires et solutions scalables.">
+    <meta property="og:image" content="profile_upright.jpg">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://mustaphaniamane.com/">
+    <meta property="twitter:title" content="Mustapha NIAMANE | Architecte Logiciel & Développeur Full Stack">
+    <meta property="twitter:description" content="Développeur Full Stack & Backend spécialisé Laravel, architectures monolithes modulaires et solutions scalables.">
+    <meta property="twitter:image" content="profile_upright.jpg">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E⚡%3C/text%3E%3C/svg%3E">
 
     <!-- Google Fonts: Plus Jakarta Sans & Space Grotesk -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -46,7 +64,7 @@
                 <li><a href="#contact" class="nav-item" data-i18n="nav-contact">Contact</a></li>
             </ul>
             <div class="nav-actions">
-                <button id="langToggle" class="lang-toggle-btn" title="Switch to English" data-lang="fr">
+                <button id="langToggle" class="lang-toggle-btn" title="Switch to English" data-lang="fr" aria-label="Changer de langue / Switch language">
                     <span class="flag-icon">
                         <svg class="flag-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 30">
                             <clipPath id="flag-uk-a"><path d="M0,0 v30 h60 v-30 z"/></clipPath>
@@ -63,10 +81,10 @@
                         </svg>
                     </span>
                 </button>
-                <button id="themeToggle" class="theme-toggle-btn" title="Changer de thème">
+                <button id="themeToggle" class="theme-toggle-btn" title="Changer de thème" aria-label="Changer de thème / Switch theme">
                     <i class="fas fa-moon"></i>
                 </button>
-                <div class="menu-toggle" id="mobile-menu">
+                <div class="menu-toggle" id="mobile-menu" aria-label="Menu de navigation" aria-expanded="false" role="button" tabindex="0">
                     <span class="bar"></span>
                     <span class="bar"></span>
                     <span class="bar"></span>
@@ -114,6 +132,9 @@
             </div>
         </a>
     </header>
+
+    <!-- Main content container -->
+    <main>
 
     <!-- About Section -->
     <section id="about" class="section">
@@ -269,7 +290,7 @@
                         <span class="tech-tag">Laravel</span>
                         <span class="tech-tag">MySQL</span>
                     </div>
-                    <a href="https://fourniscolaire.ma/en/" target="_blank" class="project-link"><i
+                    <a href="https://fourniscolaire.ma/en/" target="_blank" rel="noopener noreferrer" class="project-link"><i
                             class="fas fa-external-link-alt"></i> <span data-i18n="proj-visit">Visiter le site</span></a>
                 </div>
             </div>
@@ -291,7 +312,7 @@
                         <span class="tech-tag">React</span>
                         <span class="tech-tag">API REST</span>
                     </div>
-                    <a href="https://github.com/NIAMANE-Mustapha/OFPPT_RECRUTE-.git" target="_blank"
+                    <a href="https://github.com/NIAMANE-Mustapha/OFPPT_RECRUTE-.git" target="_blank" rel="noopener noreferrer"
                         class="project-link"><i class="fab fa-github"></i> <span data-i18n="proj-github">Voir le dépôt GitHub</span></a>
                 </div>
             </div>
@@ -312,14 +333,14 @@
                         <span class="tech-tag">HTML5 / CSS3</span>
                         <span class="tech-tag">JavaScript</span>
                     </div>
-                    <a href="https://solutionenergyconsulting.ma/" target="_blank" class="project-link"><i
+                    <a href="https://solutionenergyconsulting.ma/" target="_blank" rel="noopener noreferrer" class="project-link"><i
                             class="fas fa-external-link-alt"></i> <span data-i18n="proj-visit">Visiter le site</span></a>
                 </div>
             </div>
         </div>
 
         <div class="more-projects-container scroll-reveal" data-anim="fade-up">
-            <a href="https://github.com/NIAMANE-Mustapha" target="_blank" class="btn btn-more">
+            <a href="https://github.com/NIAMANE-Mustapha" target="_blank" rel="noopener noreferrer" class="btn btn-more">
                 <i class="fab fa-github"></i> <span data-i18n="proj-more">En savoir plus sur GitHub</span>
             </a>
         </div>
@@ -526,7 +547,7 @@
     </section>
 
     <!-- Modal pour les Détails du Projet -->
-    <div id="projectModal" class="modal">
+    <div id="projectModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
         <span class="close-modal">&times;</span>
         <div class="modal-content">
             <div class="modal-body-container">
@@ -596,14 +617,16 @@
                 </div>
 
                 <div class="social-icons">
-                    <a href="https://www.linkedin.com/in/mustapha-niamane" target="_blank" aria-label="LinkedIn"><i
+                    <a href="https://www.linkedin.com/in/mustapha-niamane" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i
                             class="fab fa-linkedin"></i></a>
-                    <a href="https://github.com/NIAMANE-Mustapha" target="_blank" aria-label="GitHub"><i
+                    <a href="https://github.com/NIAMANE-Mustapha" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i
                             class="fab fa-github"></i></a>
                 </div>
             </div>
         </div>
     </section>
+
+    </main>
 
     <!-- Footer -->
     <footer>
@@ -613,6 +636,9 @@
                     class="fas fa-arrow-up"></i></a>
         </div>
     </footer>
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container" class="toast-container" aria-live="polite" aria-atomic="true"></div>
 
     <script src="script.js"></script>
 </body>

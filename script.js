@@ -302,7 +302,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (mobileMenu && navLinks) {
         mobileMenu.addEventListener('click', () => {
-            navLinks.classList.toggle('active');
+            const isActive = navLinks.classList.toggle('active');
+            mobileMenu.setAttribute('aria-expanded', isActive ? 'true' : 'false');
 
             // Burger menu animation toggle
             const bars = document.querySelectorAll('.menu-toggle .bar');
@@ -318,6 +319,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.nav-links a').forEach(link => {
         link.addEventListener('click', () => {
             if (navLinks) navLinks.classList.remove('active');
+            if (mobileMenu) mobileMenu.setAttribute('aria-expanded', 'false');
             const bars = document.querySelectorAll('.menu-toggle .bar');
             if (bars.length >= 3) {
                 bars[0].classList.remove('rotate-down');
@@ -353,13 +355,15 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================================================
-    // LIGHTWEIGHT CANVAS PARTICLES SYSTEM (Theme-Aware)
+    // LIGHTWEIGHT CANVAS PARTICLES SYSTEM (Theme-Aware & Viewport Optimized)
     // ==========================================================================
     const canvas = document.getElementById('particleCanvas');
     const ctx = canvas ? canvas.getContext('2d') : null;
     
     let particlesArray = [];
     const numberOfParticles = 80;
+    let animationFrameId = null;
+    let isCanvasVisible = true;
     
     // Particle class
     class Particle {
@@ -461,31 +465,52 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Animation loop
     function animateParticles() {
-        if (!ctx) return;
+        if (!ctx || !isCanvasVisible) return;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         for (let i = 0; i < particlesArray.length; i++) {
             particlesArray[i].update();
         }
         connectParticles();
-        requestAnimationFrame(animateParticles);
+        animationFrameId = requestAnimationFrame(animateParticles);
+    }
+    
+    // Toggle rendering on visibility
+    function toggleParticles(visible) {
+        isCanvasVisible = visible;
+        if (visible) {
+            if (!animationFrameId) {
+                animationFrameId = requestAnimationFrame(animateParticles);
+            }
+        } else {
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+                animationFrameId = null;
+            }
+        }
     }
     
     // Handle resize
     function resizeCanvas() {
         if (!canvas) return;
         canvas.width = window.innerWidth;
-        canvas.height = Math.max(
-            document.documentElement.scrollHeight,
-            document.body.scrollHeight,
-            window.innerHeight
-        );
+        canvas.height = window.innerHeight; // Viewport height only!
         initParticles();
     }
     
     if (canvas) {
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
-        animateParticles();
+        
+        // Observe hero section visibility to pause/resume canvas loop
+        const heroSection = document.getElementById('hero');
+        if (heroSection) {
+            const canvasObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    toggleParticles(entry.isIntersecting);
+                });
+            }, { threshold: 0.05 });
+            canvasObserver.observe(heroSection);
+        }
     }
 
     // ==========================================================================
@@ -787,6 +812,56 @@ document.addEventListener('DOMContentLoaded', () => {
     // ==========================================================================
     // CONTACT FORM SUBMISSION WITH PRETTIFIED SIMULATION
     // ==========================================================================
+    // Custom Toast Notification System
+    function showToast(message, type = 'success') {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        
+        let iconClass = 'fa-check-circle';
+        if (type === 'error') iconClass = 'fa-exclamation-circle';
+        else if (type === 'info') iconClass = 'fa-info-circle';
+
+        toast.innerHTML = `
+            <div class="toast-icon"><i class="fas ${iconClass}"></i></div>
+            <div class="toast-message">${message}</div>
+            <button class="toast-close" aria-label="Fermer la notification">&times;</button>
+        `;
+
+        container.appendChild(toast);
+
+        // Trigger transition
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 50);
+
+        // Auto close after 5 seconds
+        const autoCloseTimeout = setTimeout(() => {
+            closeToast(toast);
+        }, 5000);
+
+        // Manual close
+        const closeBtn = toast.querySelector('.toast-close');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                clearTimeout(autoCloseTimeout);
+                closeToast(toast);
+            });
+        }
+    }
+
+    function closeToast(toast) {
+        toast.classList.remove('show');
+        setTimeout(() => {
+            toast.remove();
+        }, 400);
+    }
+
+    // ==========================================================================
+    // CONTACT FORM SUBMISSION WITH PRETTIFIED SIMULATION
+    // ==========================================================================
     const contactForm = document.getElementById('contactForm');
     
     if (contactForm) {
@@ -809,9 +884,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 submitBtn.querySelector('.btn-text').textContent = translations[currentLang]["contact-success"] || 'Envoyé !';
                 submitBtn.querySelector('.btn-icon').innerHTML = '<i class="fas fa-check-circle"></i>';
                 
-                // Show clean custom toast / alert instead of native block alert
+                // Show clean custom toast notification instead of browser block alert
                 setTimeout(() => {
-                    alert(translations[currentLang]["contact-alert"] || 'Merci !');
+                    showToast(translations[currentLang]["contact-alert"] || 'Merci !', 'success');
                     
                     // Reset button state
                     submitBtn.disabled = false;
