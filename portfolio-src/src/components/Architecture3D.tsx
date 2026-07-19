@@ -1,243 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Html } from '@react-three/drei';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import * as THREE from 'three';
-
-// --- DATA PACKET PARTICLE ---
-interface Packet {
-  id: number;
-  start: THREE.Vector3;
-  end: THREE.Vector3;
-  color: string;
-  progress: number;
-  speed: number;
-}
-
-const DataPacket: React.FC<{ packet: Packet; onComplete: (id: number) => void }> = ({ packet, onComplete }) => {
-  const meshRef = useRef<THREE.Mesh>(null);
-
-  useFrame((_, delta) => {
-    if (!meshRef.current) return;
-    
-    // Update progress
-    packet.progress += delta * packet.speed;
-    
-    if (packet.progress >= 1) {
-      onComplete(packet.id);
-      return;
-    }
-
-    // Interpolate positions
-    meshRef.current.position.lerpVectors(packet.start, packet.end, packet.progress);
-  });
-
-  return (
-    <mesh ref={meshRef}>
-      <sphereGeometry args={[0.09, 16, 16]} />
-      <meshBasicMaterial color={packet.color} />
-      {/* Light glow halo */}
-      <mesh>
-        <sphereGeometry args={[0.22, 8, 8]} />
-        <meshBasicMaterial color={packet.color} transparent opacity={0.35} blending={THREE.AdditiveBlending} />
-      </mesh>
-      {/* Tracing Light Source */}
-      <pointLight color={packet.color} intensity={2.0} distance={3.5} decay={2} />
-    </mesh>
-  );
-};
-
-
-// --- ARCHITECTURE NODE MESH ---
-interface ArchNodeProps {
-  position: [number, number, number];
-  type: 'client' | 'gateway' | 'module' | 'db';
-  label: string;
-  color: string;
-  isHovered: boolean;
-  onHover: (hovered: boolean) => void;
-  onClick: () => void;
-}
-
-const ArchNode: React.FC<ArchNodeProps> = ({
-  position,
-  type,
-  label,
-  color,
-  isHovered,
-  onHover,
-  onClick,
-}) => {
-  const groupRef = useRef<THREE.Group>(null);
-  const gatewayCoreRef = useRef<THREE.Mesh>(null);
-  const gatewayRingRef = useRef<THREE.Mesh>(null);
-  const moduleCoreRef = useRef<THREE.Mesh>(null);
-
-  // Floating animation & active node rotation
-  useFrame((state, delta) => {
-    if (!groupRef.current) return;
-    const time = state.clock.getElapsedTime();
-    groupRef.current.position.y = position[1] + Math.sin(time * 1.5 + position[0]) * 0.06;
-
-    if (gatewayCoreRef.current) {
-      gatewayCoreRef.current.rotation.y += delta * 0.8;
-      gatewayCoreRef.current.rotation.x += delta * 0.4;
-    }
-    if (gatewayRingRef.current) {
-      gatewayRingRef.current.rotation.z -= delta * 1.0;
-    }
-    if (moduleCoreRef.current) {
-      const scale = 1 + Math.sin(time * 5.0) * 0.12;
-      moduleCoreRef.current.scale.set(scale, scale, scale);
-    }
-  });
-
-  return (
-    <group ref={groupRef} position={[position[0], 0, position[2]]}>
-      <group
-        position={[0, position[1], 0]}
-        onClick={(e) => {
-          e.stopPropagation();
-          onClick();
-        }}
-        onPointerOver={(e) => {
-          e.stopPropagation();
-          onHover(true);
-        }}
-        onPointerOut={(e) => {
-          e.stopPropagation();
-          onHover(false);
-        }}
-      >
-        {/* REACT CLIENT (Monitor Display Model) */}
-        {type === 'client' && (
-          <group>
-            {/* Monitor screen glass pane */}
-            <mesh>
-              <boxGeometry args={[1.3, 0.8, 0.1]} />
-              <meshPhysicalMaterial
-                color={isHovered ? color : '#334155'}
-                roughness={0.1}
-                metalness={0.9}
-                transmission={0.4}
-                thickness={0.5}
-              />
-            </mesh>
-            {/* Monitor stand */}
-            <mesh position={[0, -0.5, 0]}>
-              <cylinderGeometry args={[0.06, 0.12, 0.3, 16]} />
-              <meshStandardMaterial color="#475569" metalness={0.9} roughness={0.1} />
-            </mesh>
-            {/* Glowing Screen Content Display */}
-            <mesh position={[0, 0, 0.052]}>
-              <planeGeometry args={[1.18, 0.68]} />
-              <meshBasicMaterial color={isHovered ? color : '#1e293b'} toneMapped={false} />
-            </mesh>
-          </group>
-        )}
-
-        {/* API GATEWAY (Octahedron with Rotating Ring) */}
-        {type === 'gateway' && (
-          <group>
-            <mesh ref={gatewayCoreRef}>
-              <octahedronGeometry args={[0.55, 0]} />
-              <meshPhysicalMaterial
-                color={isHovered ? color : '#334155'}
-                roughness={0.1}
-                metalness={0.9}
-                clearcoat={1.0}
-                transmission={0.5}
-                thickness={0.7}
-              />
-            </mesh>
-            <mesh ref={gatewayRingRef} rotation={[Math.PI / 2.3, 0, 0]}>
-              <torusGeometry args={[0.78, 0.04, 8, 36]} />
-              <meshBasicMaterial color={isHovered ? color : '#475569'} />
-            </mesh>
-          </group>
-        )}
-
-        {/* SERVICE MODULES (Nested spheres with pulsing neon core) */}
-        {type === 'module' && (
-          <group>
-            <mesh>
-              <sphereGeometry args={[0.52, 32, 32]} />
-              <meshPhysicalMaterial
-                color={isHovered ? color : '#334155'}
-                roughness={0.05}
-                metalness={0.9}
-                transmission={0.7}
-                thickness={0.9}
-                ior={1.48}
-              />
-            </mesh>
-            <mesh ref={moduleCoreRef}>
-              <sphereGeometry args={[0.24, 16, 16]} />
-              <meshBasicMaterial color={color} toneMapped={false} />
-            </mesh>
-          </group>
-        )}
-
-        {/* MYSQL DATABASE (Stacked disk tower with neon rings) */}
-        {type === 'db' && (
-          <group>
-            <mesh position={[0, 0.32, 0]}>
-              <cylinderGeometry args={[0.55, 0.55, 0.18, 32]} />
-              <meshPhysicalMaterial color={isHovered ? color : '#334155'} roughness={0.15} metalness={0.9} />
-            </mesh>
-            <mesh position={[0, 0, 0]}>
-              <cylinderGeometry args={[0.55, 0.55, 0.18, 32]} />
-              <meshPhysicalMaterial color={isHovered ? color : '#334155'} roughness={0.15} metalness={0.9} />
-            </mesh>
-            <mesh position={[0, -0.32, 0]}>
-              <cylinderGeometry args={[0.55, 0.55, 0.18, 32]} />
-              <meshPhysicalMaterial color={isHovered ? color : '#334155'} roughness={0.15} metalness={0.9} />
-            </mesh>
-            {/* Glowing neon spacers between server cylinders */}
-            <mesh position={[0, 0.16, 0]}>
-              <cylinderGeometry args={[0.48, 0.48, 0.03, 16]} />
-              <meshBasicMaterial color={isHovered ? color : '#1e293b'} />
-            </mesh>
-            <mesh position={[0, -0.16, 0]}>
-              <cylinderGeometry args={[0.48, 0.48, 0.03, 16]} />
-              <meshBasicMaterial color={isHovered ? color : '#1e293b'} />
-            </mesh>
-          </group>
-        )}
-
-        {/* Glow halo underlay */}
-        {isHovered && (
-          <mesh>
-            {type === 'client' && <boxGeometry args={[1.42, 0.92, 0.2]} />}
-            {type === 'gateway' && <sphereGeometry args={[0.82, 16, 16]} />}
-            {type === 'module' && <sphereGeometry args={[0.62, 16, 16]} />}
-            {type === 'db' && <cylinderGeometry args={[0.65, 0.65, 0.95, 16]} />}
-            <meshBasicMaterial color={color} transparent opacity={0.1} blending={THREE.AdditiveBlending} />
-          </mesh>
-        )}
-
-        <Html distanceFactor={10} position={[0, type === 'db' ? -0.85 : type === 'client' ? 0.7 : 0.85, 0]} center>
-          <div className="px-3 py-1 rounded-md glass-card text-xs font-bold text-textMain whitespace-nowrap pointer-events-none select-none border border-borderGlass shadow-lg">
-            {label}
-          </div>
-        </Html>
-      </group>
-    </group>
-  );
-};
-
-// --- CONNECTING BEAMS ---
-const FlowBeam: React.FC<{ start: [number, number, number]; end: [number, number, number] }> = ({ start, end }) => {
-  const linePoints = [new THREE.Vector3(...start), new THREE.Vector3(...end)];
-  const lineGeometry = new THREE.BufferGeometry().setFromPoints(linePoints);
-
-  return (
-    // @ts-ignore
-    <line geometry={lineGeometry}>
-      <lineBasicMaterial color="rgba(255, 255, 255, 0.05)" />
-    </line>
-  );
-};
 
 // --- MAIN ARCHITECTURE COMPONENT ---
 interface ArchitectureProps {
@@ -247,50 +9,14 @@ interface ArchitectureProps {
 export const Architecture3D: React.FC<ArchitectureProps> = ({ lang }) => {
   const [activeNode, setActiveNode] = useState<string>('gateway');
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
-  const [packets, setPackets] = useState<Packet[]>([]);
-  const packetIdRef = useRef(0);
 
-  // Define nodes coordinates
+  // Nodes coordinates (in SVG viewBox space)
   const nodes = {
-    client: { pos: [0, 2.2, 0] as [number, number, number], label: 'React Client SPA', type: 'client' as const, color: '#61dafb' },
-    gateway: { pos: [0, 0.6, 0] as [number, number, number], label: 'Core Laravel Gateway', type: 'gateway' as const, color: '#ff2d20' },
-    wallet: { pos: [-2.2, -0.8, 0] as [number, number, number], label: 'Module Wallet', type: 'module' as const, color: '#00f2fe' },
-    gamification: { pos: [2.2, -0.8, 0] as [number, number, number], label: 'Module Gamification', type: 'module' as const, color: '#a855f7' },
-    db: { pos: [0, -2.2, 0] as [number, number, number], label: 'MySQL Shared DB', type: 'db' as const, color: '#10b981' },
-  };
-
-  // Periodically emit data packets along connection lines
-  useEffect(() => {
-    const emit = () => {
-      const paths = [
-        // Client -> Gateway
-        { start: nodes.client.pos, end: nodes.gateway.pos, color: '#61dafb' },
-        // Gateway -> Modules
-        { start: nodes.gateway.pos, end: nodes.wallet.pos, color: '#00f2fe' },
-        { start: nodes.gateway.pos, end: nodes.gamification.pos, color: '#a855f7' },
-        // Modules -> Database
-        { start: nodes.wallet.pos, end: nodes.db.pos, color: '#10b981' },
-        { start: nodes.gamification.pos, end: nodes.db.pos, color: '#10b981' },
-      ];
-
-      const newPackets: Packet[] = paths.map((path) => ({
-        id: packetIdRef.current++,
-        start: new THREE.Vector3(...path.start),
-        end: new THREE.Vector3(...path.end),
-        color: path.color,
-        progress: 0,
-        speed: 0.35 + Math.random() * 0.15,
-      }));
-
-      setPackets((prev) => [...prev, ...newPackets]);
-    };
-
-    const interval = setInterval(emit, 2500);
-    return () => clearInterval(interval);
-  }, []);
-
-  const removePacket = (id: number) => {
-    setPackets((prev) => prev.filter((p) => p.id !== id));
+    client: { label: 'React Client SPA', type: 'Client', color: '#61dafb' },
+    gateway: { label: 'Core Laravel Gateway', type: 'Gateway', color: '#ff2d20' },
+    wallet: { label: 'Module Wallet', type: 'Module', color: '#00f2fe' },
+    gamification: { label: 'Module Gamification', type: 'Module', color: '#a855f7' },
+    db: { label: 'MySQL Shared DB', type: 'Database', color: '#10b981' },
   };
 
   // Node details text mapping
@@ -344,53 +70,255 @@ export const Architecture3D: React.FC<ArchitectureProps> = ({ lang }) => {
       {/* Title */}
       <div className="text-center mb-6">
         <h2 className="text-3xl sm:text-5xl font-heading font-bold mb-4 text-textMain">
-          {lang === 'fr' ? 'Architecture 3D Interactive' : 'Interactive 3D Architecture'}
+          {lang === 'fr' ? 'Architecture Système Interactive' : 'Interactive System Architecture'}
         </h2>
         <p className="text-textMuted max-w-2xl mx-auto text-sm sm:text-base mb-12">
           {lang === 'fr' 
-            ? "Visualisation tridimensionnelle du monolithe modulaire implémenté pour mes applications, montrant les flux de requêtes et de données."
-            : "Three-dimensional visualization of the modular monolith architecture, displaying request routing and transactional data packets."}
+            ? "Visualisation interactive du monolithe modulaire implémenté pour mes applications, montrant les flux de requêtes et de transactions."
+            : "Interactive visualization of the modular monolith architecture, displaying request routing and transactional data flow paths."}
         </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
-        {/* Left: Interactive 3D Canvas */}
-        <div className="lg:col-span-7 h-[450px] lg:h-[550px] glass-card rounded-3xl overflow-hidden relative border border-borderGlass bg-bgDark/40">
-          <Canvas camera={{ position: [0, 0, 8], fov: 60 }} dpr={[1, 1.5]}>
-            <ambientLight intensity={0.25} />
-            <pointLight position={[6, 6, 6]} intensity={1.8} color="#00f2fe" />
-            <pointLight position={[-6, -6, -6]} intensity={1.2} color="#a855f7" />
-            <pointLight position={[0, -6, 2]} intensity={1.0} color="#10b981" />
-            <directionalLight position={[0, 6, 0]} intensity={1.5} color="#ffffff" />
-            
-            {/* Connections */}
-            <FlowBeam start={nodes.client.pos} end={nodes.gateway.pos} />
-            <FlowBeam start={nodes.gateway.pos} end={nodes.wallet.pos} />
-            <FlowBeam start={nodes.gateway.pos} end={nodes.gamification.pos} />
-            <FlowBeam start={nodes.wallet.pos} end={nodes.db.pos} />
-            <FlowBeam start={nodes.gamification.pos} end={nodes.db.pos} />
+        {/* Left: Interactive 2D SVG/HTML Schema Container */}
+        <div className="lg:col-span-7 h-[450px] lg:h-[550px] glass-card rounded-3xl overflow-hidden relative border border-borderGlass bg-slate-950/20">
+          <div className="absolute top-4 left-6 z-10 text-xs font-semibold text-textMuted select-none">
+            &lt; Click nodes to inspect request details &gt;
+          </div>
 
-            {/* Packets */}
-            {packets.map((p) => (
-              <DataPacket key={p.id} packet={p} onComplete={removePacket} />
-            ))}
+          {/* Embedded Custom CSS animation style for GPU dashed line offset */}
+          <style>{`
+            @keyframes flowDash {
+              to {
+                stroke-dashoffset: -20;
+              }
+            }
+            .animate-flow-dash {
+              animation: flowDash 1.2s linear infinite;
+            }
+          `}</style>
 
-            {/* Nodes */}
-            {Object.entries(nodes).map(([key, node]) => (
-              <ArchNode
-                key={key}
-                position={node.pos}
-                type={node.type}
-                label={node.label}
-                color={node.color}
-                isHovered={hoveredNode === key || activeNode === key}
-                onHover={(hovered) => setHoveredNode(hovered ? key : null)}
-                onClick={() => setActiveNode(key)}
-              />
-            ))}
+          {/* SVG Connection Tracks */}
+          <svg viewBox="0 0 500 500" className="w-full h-full absolute inset-0 z-0">
+            <defs>
+              <radialGradient id="gateway-glow" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stopColor="#ff2d20" stopOpacity="0.15" />
+                <stop offset="100%" stopColor="#ff2d20" stopOpacity="0" />
+              </radialGradient>
+            </defs>
 
-            <OrbitControls enableZoom={false} enablePan={false} maxPolarAngle={Math.PI / 1.8} minPolarAngle={Math.PI / 2.5} />
-          </Canvas>
+            <circle cx="250" cy="190" r="100" fill="url(#gateway-glow)" />
+
+            {/* Client -> Gateway */}
+            <path 
+              d="M 250 50 L 250 190" 
+              stroke="#61dafb" 
+              strokeWidth="2" 
+              className="transition-all duration-300"
+              opacity={hoveredNode === 'client' || hoveredNode === 'gateway' || activeNode === 'client' || activeNode === 'gateway' ? 0.7 : 0.2} 
+            />
+            <path 
+              d="M 250 50 L 250 190" 
+              stroke="#61dafb" 
+              strokeWidth="2" 
+              strokeDasharray="6 4" 
+              className="animate-flow-dash transition-all duration-300"
+              opacity={hoveredNode === 'client' || hoveredNode === 'gateway' || activeNode === 'client' || activeNode === 'gateway' ? 0.9 : 0.4} 
+            />
+
+            {/* Gateway -> Wallet */}
+            <path 
+              d="M 250 190 L 100 320" 
+              stroke="#00f2fe" 
+              strokeWidth="2" 
+              className="transition-all duration-300"
+              opacity={hoveredNode === 'gateway' || hoveredNode === 'wallet' || activeNode === 'gateway' || activeNode === 'wallet' ? 0.7 : 0.2} 
+            />
+            <path 
+              d="M 250 190 L 100 320" 
+              stroke="#00f2fe" 
+              strokeWidth="2" 
+              strokeDasharray="6 4" 
+              className="animate-flow-dash transition-all duration-300"
+              opacity={hoveredNode === 'gateway' || hoveredNode === 'wallet' || activeNode === 'gateway' || activeNode === 'wallet' ? 0.9 : 0.4} 
+            />
+
+            {/* Gateway -> Gamification */}
+            <path 
+              d="M 250 190 L 400 320" 
+              stroke="#a855f7" 
+              strokeWidth="2" 
+              className="transition-all duration-300"
+              opacity={hoveredNode === 'gateway' || hoveredNode === 'gamification' || activeNode === 'gateway' || activeNode === 'gamification' ? 0.7 : 0.2} 
+            />
+            <path 
+              d="M 250 190 L 400 320" 
+              stroke="#a855f7" 
+              strokeWidth="2" 
+              strokeDasharray="6 4" 
+              className="animate-flow-dash transition-all duration-300"
+              opacity={hoveredNode === 'gateway' || hoveredNode === 'gamification' || activeNode === 'gateway' || activeNode === 'gamification' ? 0.9 : 0.4} 
+            />
+
+            {/* Wallet -> DB */}
+            <path 
+              d="M 100 320 L 250 440" 
+              stroke="#10b981" 
+              strokeWidth="2" 
+              className="transition-all duration-300"
+              opacity={hoveredNode === 'wallet' || hoveredNode === 'db' || activeNode === 'wallet' || activeNode === 'db' ? 0.7 : 0.2} 
+            />
+            <path 
+              d="M 100 320 L 250 440" 
+              stroke="#10b981" 
+              strokeWidth="2" 
+              strokeDasharray="6 4" 
+              className="animate-flow-dash transition-all duration-300"
+              opacity={hoveredNode === 'wallet' || hoveredNode === 'db' || activeNode === 'wallet' || activeNode === 'db' ? 0.9 : 0.4} 
+            />
+
+            {/* Gamification -> DB */}
+            <path 
+              d="M 400 320 L 250 440" 
+              stroke="#10b981" 
+              strokeWidth="2" 
+              className="transition-all duration-300"
+              opacity={hoveredNode === 'gamification' || hoveredNode === 'db' || activeNode === 'gamification' || activeNode === 'db' ? 0.7 : 0.2} 
+            />
+            <path 
+              d="M 400 320 L 250 440" 
+              stroke="#10b981" 
+              strokeWidth="2" 
+              strokeDasharray="6 4" 
+              className="animate-flow-dash transition-all duration-300"
+              opacity={hoveredNode === 'gamification' || hoveredNode === 'db' || activeNode === 'gamification' || activeNode === 'db' ? 0.9 : 0.4} 
+            />
+
+            {/* Cascading Moving Circle Packets (Compositor Loop) */}
+            <circle r="4" fill="#61dafb">
+              <animateMotion dur="3.5s" repeatCount="indefinite" path="M 250 50 L 250 190" />
+            </circle>
+            <circle r="4" fill="#00f2fe">
+              <animateMotion dur="2.8s" repeatCount="indefinite" path="M 250 190 L 100 320" />
+            </circle>
+            <circle r="4" fill="#a855f7">
+              <animateMotion dur="2.8s" repeatCount="indefinite" path="M 250 190 L 400 320" />
+            </circle>
+            <circle r="4" fill="#10b981">
+              <animateMotion dur="3.2s" repeatCount="indefinite" path="M 100 320 L 250 440" />
+            </circle>
+            <circle r="4" fill="#10b981">
+              <animateMotion dur="3.2s" repeatCount="indefinite" path="M 400 320 L 250 440" />
+            </circle>
+          </svg>
+
+          {/* Interactive overlays (Absolute HTML cards) */}
+          
+          {/* CLIENT */}
+          <button 
+            onClick={() => setActiveNode('client')}
+            onMouseEnter={() => setHoveredNode('client')}
+            onMouseLeave={() => setHoveredNode(null)}
+            style={{ left: "50%", top: "11%" }}
+            className={`absolute -translate-x-[50%] -translate-y-[50%] z-20 transition-all duration-300 w-44 p-3 glass-card border rounded-2xl flex items-center gap-3 ${
+              activeNode === 'client' 
+                ? 'border-[#61dafb] shadow-[0_0_20px_rgba(97,218,251,0.25)] bg-slate-900/90 scale-105' 
+                : 'border-borderGlass hover:bg-slate-900/40 hover:scale-105'
+            }`}
+          >
+            <div className="w-8 h-8 rounded-lg bg-[#61dafb]/10 flex items-center justify-center text-[#61dafb] shrink-0">
+              <i className="fab fa-react text-lg" />
+            </div>
+            <div className="text-left leading-none">
+              <div className="text-[10px] text-textMuted uppercase tracking-wider font-mono">Client</div>
+              <div className="text-xs font-bold text-textMain mt-0.5">React SPA</div>
+            </div>
+            <div className="ml-auto w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          </button>
+
+          {/* GATEWAY */}
+          <button 
+            onClick={() => setActiveNode('gateway')}
+            onMouseEnter={() => setHoveredNode('gateway')}
+            onMouseLeave={() => setHoveredNode(null)}
+            style={{ left: "50%", top: "38%" }}
+            className={`absolute -translate-x-[50%] -translate-y-[50%] z-20 transition-all duration-300 w-48 p-3 glass-card border rounded-2xl flex items-center gap-3 ${
+              activeNode === 'gateway' 
+                ? 'border-[#ff2d20] shadow-[0_0_20px_rgba(255,45,32,0.25)] bg-slate-900/90 scale-105' 
+                : 'border-borderGlass hover:bg-slate-900/40 hover:scale-105'
+            }`}
+          >
+            <div className="w-8 h-8 rounded-lg bg-[#ff2d20]/10 flex items-center justify-center text-[#ff2d20] shrink-0 animate-spin-slow">
+              <i className="fab fa-laravel text-lg" />
+            </div>
+            <div className="text-left leading-none">
+              <div className="text-[10px] text-textMuted uppercase tracking-wider font-mono">Gateway</div>
+              <div className="text-xs font-bold text-textMain mt-0.5">Laravel API Router</div>
+            </div>
+          </button>
+
+          {/* WALLET */}
+          <button 
+            onClick={() => setActiveNode('wallet')}
+            onMouseEnter={() => setHoveredNode('wallet')}
+            onMouseLeave={() => setHoveredNode(null)}
+            style={{ left: "20%", top: "64%" }}
+            className={`absolute -translate-x-[50%] -translate-y-[50%] z-20 transition-all duration-300 w-40 p-3 glass-card border rounded-2xl flex items-center gap-3 ${
+              activeNode === 'wallet' 
+                ? 'border-[#00f2fe] shadow-[0_0_20px_rgba(0,242,254,0.25)] bg-slate-900/90 scale-105' 
+                : 'border-borderGlass hover:bg-slate-900/40 hover:scale-105'
+            }`}
+          >
+            <div className="w-8 h-8 rounded-lg bg-[#00f2fe]/10 flex items-center justify-center text-[#00f2fe] shrink-0">
+              <i className="fa fa-wallet text-sm" />
+            </div>
+            <div className="text-left leading-none">
+              <div className="text-[10px] text-textMuted uppercase tracking-wider font-mono">Module</div>
+              <div className="text-xs font-bold text-textMain mt-0.5">Wallet</div>
+            </div>
+          </button>
+
+          {/* GAMIFICATION */}
+          <button 
+            onClick={() => setActiveNode('gamification')}
+            onMouseEnter={() => setHoveredNode('gamification')}
+            onMouseLeave={() => setHoveredNode(null)}
+            style={{ left: "80%", top: "64%" }}
+            className={`absolute -translate-x-[50%] -translate-y-[50%] z-20 transition-all duration-300 w-40 p-3 glass-card border rounded-2xl flex items-center gap-3 ${
+              activeNode === 'gamification' 
+                ? 'border-[#a855f7] shadow-[0_0_20px_rgba(168,85,247,0.25)] bg-slate-900/90 scale-105' 
+                : 'border-borderGlass hover:bg-slate-900/40 hover:scale-105'
+            }`}
+          >
+            <div className="w-8 h-8 rounded-lg bg-[#a855f7]/10 flex items-center justify-center text-[#a855f7] shrink-0">
+              <i className="fa fa-trophy text-sm" />
+            </div>
+            <div className="text-left leading-none">
+              <div className="text-[10px] text-textMuted uppercase tracking-wider font-mono">Module</div>
+              <div className="text-xs font-bold text-textMain mt-0.5">Gamification</div>
+            </div>
+          </button>
+
+          {/* DATABASE */}
+          <button 
+            onClick={() => setActiveNode('db')}
+            onMouseEnter={() => setHoveredNode('db')}
+            onMouseLeave={() => setHoveredNode(null)}
+            style={{ left: "50%", top: "88%" }}
+            className={`absolute -translate-x-[50%] -translate-y-[50%] z-20 transition-all duration-300 w-48 p-3 glass-card border rounded-2xl flex items-center gap-3 ${
+              activeNode === 'db' 
+                ? 'border-[#10b981] shadow-[0_0_20px_rgba(16,185,129,0.25)] bg-slate-900/90 scale-105' 
+                : 'border-borderGlass hover:bg-slate-900/40 hover:scale-105'
+            }`}
+          >
+            <div className="w-8 h-8 rounded-lg bg-[#10b981]/10 flex items-center justify-center text-[#10b981] shrink-0">
+              <i className="fa fa-database text-sm" />
+            </div>
+            <div className="text-left leading-none">
+              <div className="text-[10px] text-textMuted uppercase tracking-wider font-mono">Database</div>
+              <div className="text-xs font-bold text-textMain mt-0.5">MySQL Shared DB</div>
+            </div>
+          </button>
         </div>
 
         {/* Right: Glassmorphic Component Detail Sidebar Panel */}
@@ -440,8 +368,8 @@ export const Architecture3D: React.FC<ArchitectureProps> = ({ lang }) => {
 
               <div className="text-xs text-textMuted mt-8 pt-4 border-t border-borderGlass">
                 {lang === 'fr' 
-                  ? "*Cliquez sur un autre nœud 3D pour voir ses détails."
-                  : "*Click on other 3D nodes to view their responsibilities."}
+                  ? "*Cliquez sur un autre nœud pour voir ses détails."
+                  : "*Click on other nodes to view their responsibilities."}
               </div>
             </motion.div>
           </AnimatePresence>

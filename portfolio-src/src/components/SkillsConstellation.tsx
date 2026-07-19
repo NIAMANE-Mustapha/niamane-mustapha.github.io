@@ -1,162 +1,7 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { translations } from '../i18n';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Html, Points, PointMaterial } from '@react-three/drei';
 import { motion, AnimatePresence } from 'framer-motion';
-import * as THREE from 'three';
 
-// --- INTERACTIVE 3D CONSTELLATION NODE ---
-interface NodeProps {
-  position: [number, number, number];
-  color: string;
-  name: string;
-  level: number;
-  isSelected: boolean;
-  onHover: (hovered: boolean) => void;
-  onClick: () => void;
-  type: string;
-}
-
-const ConstellationNode: React.FC<NodeProps> = ({
-  position,
-  color,
-  name,
-  level,
-  isSelected,
-  onHover,
-  onClick,
-  type,
-}) => {
-  const meshRef = useRef<THREE.Mesh>(null);
-  const [hovered, setHovered] = useState(false);
-
-  // Organic bounce/float and continuous spin animation
-  useFrame((state, delta) => {
-    if (!meshRef.current) return;
-    const time = state.clock.getElapsedTime();
-    const offset = position[0] * 10; // offset based on position
-    meshRef.current.position.y = position[1] + Math.sin(time + offset) * 0.12;
-    
-    // Slow rotational spin
-    meshRef.current.rotation.x += delta * 0.35;
-    meshRef.current.rotation.y += delta * 0.22;
-  });
-
-  return (
-    <group>
-      <mesh
-        ref={meshRef}
-        position={position}
-        onClick={(e) => {
-          e.stopPropagation();
-          onClick();
-        }}
-        onPointerOver={(e) => {
-          e.stopPropagation();
-          setHovered(true);
-          onHover(true);
-        }}
-        onPointerOut={(e) => {
-          e.stopPropagation();
-          setHovered(false);
-          onHover(false);
-        }}
-      >
-        {type === 'backend' && <dodecahedronGeometry args={[isSelected ? 0.72 : hovered ? 0.62 : 0.5, 0]} />}
-        {type === 'frontend' && <icosahedronGeometry args={[isSelected ? 0.72 : hovered ? 0.62 : 0.5, 0]} />}
-        {type === 'db' && <cylinderGeometry args={[isSelected ? 0.55 : hovered ? 0.46 : 0.36, isSelected ? 0.55 : hovered ? 0.46 : 0.36, 0.75, 6]} />}
-        {type === 'devops' && <torusKnotGeometry args={[isSelected ? 0.38 : hovered ? 0.32 : 0.25, 0.08, 48, 8, 2, 3]} />}
-
-        <meshPhysicalMaterial
-          color={hovered || isSelected ? color : '#475569'}
-          roughness={0.15}
-          metalness={0.8}
-          clearcoat={1.0}
-          clearcoatRoughness={0.1}
-          transmission={0.45}
-          thickness={0.6}
-          ior={1.45}
-          flatShading={type !== 'devops'} // clean faceted look for nodes, smooth for torus knot
-        />
-        
-        {/* Glowing halo indicator */}
-        {(hovered || isSelected) && (
-          <mesh>
-            {type === 'backend' && <dodecahedronGeometry args={[isSelected ? 0.9 : 0.78, 0]} />}
-            {type === 'frontend' && <icosahedronGeometry args={[isSelected ? 0.9 : 0.78, 0]} />}
-            {type === 'db' && <cylinderGeometry args={[isSelected ? 0.72 : 0.6, isSelected ? 0.72 : 0.6, 0.95, 6]} />}
-            {type === 'devops' && <torusKnotGeometry args={[isSelected ? 0.5 : 0.42, 0.12, 48, 8, 2, 3]} />}
-            <meshBasicMaterial
-              color={color}
-              transparent
-              opacity={0.12}
-              blending={THREE.AdditiveBlending}
-              wireframe
-            />
-          </mesh>
-        )}
-
-        {/* 3D Label Overlay */}
-        <Html distanceFactor={10} position={[0, type === 'db' ? 0.9 : 1.1, 0]} center>
-          <div className="px-3 py-1 rounded-md glass-card text-xs font-semibold text-textMain whitespace-nowrap pointer-events-none select-none border border-borderGlass shadow-md">
-            {name} ({level}%)
-          </div>
-        </Html>
-      </mesh>
-    </group>
-  );
-};
-
-// --- CONNECTING THREADS ---
-const ConnectingLines: React.FC<{ points: [number, number, number][] }> = ({ points }) => {
-  const lineGeometry = new THREE.BufferGeometry().setFromPoints(
-    points.map((p) => new THREE.Vector3(...p))
-  );
-
-  return (
-    // @ts-ignore
-    <line geometry={lineGeometry}>
-      <lineBasicMaterial color="rgba(99, 102, 241, 0.15)" linewidth={1} />
-    </line>
-  );
-};
-
-// --- DRIFTING STARS BACKGROUND ---
-const DriftingStars: React.FC<{ count: number }> = ({ count }) => {
-  const pointsRef = useRef<THREE.Points>(null);
-
-  const [positions] = useState(() => {
-    const arr = new Float32Array(count * 3);
-    for (let i = 0; i < count; i++) {
-      arr[i * 3] = (Math.random() - 0.5) * 16;
-      arr[i * 3 + 1] = (Math.random() - 0.5) * 16;
-      arr[i * 3 + 2] = (Math.random() - 0.5) * 10 - 2;
-    }
-    return arr;
-  });
-
-  useFrame((state) => {
-    if (!pointsRef.current) return;
-    const time = state.clock.getElapsedTime();
-    pointsRef.current.rotation.y = time * 0.015;
-    pointsRef.current.rotation.x = time * 0.01;
-  });
-
-  return (
-    <Points ref={pointsRef} positions={positions} stride={3} limit={count}>
-      <PointMaterial
-        transparent
-        color="#a855f7"
-        size={0.05}
-        sizeAttenuation={true}
-        depthWrite={false}
-        blending={THREE.AdditiveBlending}
-      />
-    </Points>
-  );
-};
-
-// --- MAIN SKILLS COMPONENT ---
 interface SkillsProps {
   lang: 'fr' | 'en';
 }
@@ -164,14 +9,6 @@ interface SkillsProps {
 export const SkillsConstellation: React.FC<SkillsProps> = ({ lang }) => {
   const t = translations[lang];
   const [selectedIdx, setSelectedIdx] = useState(0);
-
-  // Position coordinates for 3D nodes
-  const nodePositions: [number, number, number][] = [
-    [-3, 1, 0],  // Backend
-    [3, 1.5, 0], // Frontend
-    [-1, -2, 2], // DBs
-    [1, -1.5, -2] // DevOps
-  ];
 
   const skillCategories = [
     {
@@ -181,7 +18,6 @@ export const SkillsConstellation: React.FC<SkillsProps> = ({ lang }) => {
       level: 90,
       color: '#00f2fe',
       icon: 'fa-php',
-      type: 'backend',
       technos: ['PHP', 'Laravel 11', 'API RESTful', 'Domain Driven Design (DDD)', 'MVC', 'JWT']
     },
     {
@@ -191,7 +27,6 @@ export const SkillsConstellation: React.FC<SkillsProps> = ({ lang }) => {
       level: 80,
       color: '#6366f1',
       icon: 'fa-js',
-      type: 'frontend',
       technos: ['JavaScript ES6+', 'TypeScript', 'React.js', 'Three.js', 'Tailwind CSS', 'HTML5 & CSS3']
     },
     {
@@ -201,7 +36,6 @@ export const SkillsConstellation: React.FC<SkillsProps> = ({ lang }) => {
       level: 85,
       color: '#a855f7',
       icon: 'fa-database',
-      type: 'db',
       technos: ['SQL / MySQL', 'MongoDB', 'Query Optimization', 'Indexing', 'Database Partitioning']
     },
     {
@@ -211,12 +45,10 @@ export const SkillsConstellation: React.FC<SkillsProps> = ({ lang }) => {
       level: 85,
       color: '#10b981',
       icon: 'fa-tools',
-      type: 'devops',
       technos: ['Git / GitHub', 'Docker', 'Linux / Nginx', 'CI/CD (GitHub Actions)', 'Scrum / Agile']
     }
   ];
 
-  // Active details card selector
   const activeSkill = skillCategories[selectedIdx];
 
   return (
@@ -235,50 +67,108 @@ export const SkillsConstellation: React.FC<SkillsProps> = ({ lang }) => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
-          {/* Left: 3D interactive Skill Constellation Graph */}
-          <div className="lg:col-span-7 h-[400px] lg:h-[500px] glass-card rounded-3xl overflow-hidden relative border border-borderGlass">
+          {/* Left: 2D Interactive Skill Constellation Graph */}
+          <div className="lg:col-span-7 h-[400px] lg:h-[500px] glass-card rounded-3xl overflow-hidden relative border border-borderGlass bg-slate-950/20">
             <div className="absolute top-4 left-6 z-10 text-xs font-semibold text-textMuted select-none">
-              &lt; Drag to rotate, click nodes to inspect &gt;
+              &lt; Click nodes to inspect &gt;
             </div>
 
-            <Canvas camera={{ position: [0, 0, 7.5], fov: 60 }} dpr={[1, 1.5]}>
-              <ambientLight intensity={0.25} />
-              <pointLight position={[5, 5, 5]} intensity={1.5} color="#00f2fe" />
-              <pointLight position={[-5, -5, -5]} intensity={1.0} color="#6366f1" />
-              <pointLight position={[0, -5, 3]} intensity={0.8} color="#a855f7" />
-              <directionalLight position={[0, 5, 0]} intensity={1.2} color="#ffffff" />
+            {/* SVG Connecting Tracks */}
+            <svg viewBox="0 0 500 400" className="w-full h-full absolute inset-0 z-0">
+              <defs>
+                <radialGradient id="core-glow" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stopColor="#6366f1" stopOpacity="0.25" />
+                  <stop offset="100%" stopColor="#6366f1" stopOpacity="0" />
+                </radialGradient>
+              </defs>
               
-              {/* Connect nodes with line threads */}
-              <ConnectingLines points={[
-                nodePositions[0], nodePositions[1],
-                nodePositions[1], nodePositions[2],
-                nodePositions[2], nodePositions[3],
-                nodePositions[3], nodePositions[0],
-                nodePositions[0], nodePositions[2],
-                nodePositions[1], nodePositions[3],
-              ]} />
+              {/* Background ambient core glow */}
+              <circle cx="250" cy="200" r="90" fill="url(#core-glow)" />
 
-              {/* Skill Spheres */}
-              {skillCategories.map((cat, i) => (
-                <ConstellationNode
+              {/* Connecting Lines */}
+              <line x1="250" y1="200" x2="110" y2="120" stroke="rgba(99, 102, 241, 0.2)" strokeWidth="1.5" strokeDasharray="3 3" />
+              <line x1="250" y1="200" x2="390" y2="100" stroke="rgba(99, 102, 241, 0.2)" strokeWidth="1.5" strokeDasharray="3 3" />
+              <line x1="250" y1="200" x2="130" y2="290" stroke="rgba(99, 102, 241, 0.2)" strokeWidth="1.5" strokeDasharray="3 3" />
+              <line x1="250" y1="200" x2="370" y2="300" stroke="rgba(99, 102, 241, 0.2)" strokeWidth="1.5" strokeDasharray="3 3" />
+
+              <line x1="110" y1="120" x2="390" y2="100" stroke="rgba(99, 102, 241, 0.12)" strokeWidth="1.2" />
+              <line x1="390" y1="100" x2="370" y2="300" stroke="rgba(99, 102, 241, 0.12)" strokeWidth="1.2" />
+              <line x1="370" y1="300" x2="130" y2="290" stroke="rgba(99, 102, 241, 0.12)" strokeWidth="1.2" />
+              <line x1="130" y1="290" x2="110" y2="120" stroke="rgba(99, 102, 241, 0.12)" strokeWidth="1.2" />
+              
+              {/* Star dust points */}
+              <circle cx="80" cy="220" r="1.5" fill="#a855f7" opacity="0.4" />
+              <circle cx="430" cy="180" r="1" fill="#00f2fe" opacity="0.3" />
+              <circle cx="210" cy="80" r="1.2" fill="#6366f1" opacity="0.5" />
+              <circle cx="310" cy="330" r="1.5" fill="#10b981" opacity="0.4" />
+              <circle cx="150" cy="160" r="1" fill="#fff" opacity="0.3" />
+
+              {/* Glowing animations */}
+              <circle r="3.5" fill="#00f2fe">
+                <animateMotion dur="5s" repeatCount="indefinite" path="M 250 200 L 110 120" />
+              </circle>
+              <circle r="3.5" fill="#6366f1">
+                <animateMotion dur="4.2s" repeatCount="indefinite" path="M 250 200 L 390 100" />
+              </circle>
+              <circle r="3.5" fill="#a855f7">
+                <animateMotion dur="6s" repeatCount="indefinite" path="M 250 200 L 130 290" />
+              </circle>
+              <circle r="3.5" fill="#10b981">
+                <animateMotion dur="4.8s" repeatCount="indefinite" path="M 250 200 L 370 300" />
+              </circle>
+              
+              <circle r="3" fill="#6366f1" opacity="0.6">
+                <animateMotion dur="7s" repeatCount="indefinite" path="M 110 120 L 390 100" />
+              </circle>
+              <circle r="3" fill="#10b981" opacity="0.6">
+                <animateMotion dur="8s" repeatCount="indefinite" path="M 390 100 L 370 300" />
+              </circle>
+            </svg>
+
+            {/* Central Stack Core Hub */}
+            <div className="absolute left-[50%] top-[50%] -translate-x-[50%] -translate-y-[50%] z-10 flex flex-col items-center select-none">
+              <div className="w-14 h-14 rounded-full bg-slate-900 border border-primary/40 flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.25)] relative">
+                <div className="absolute inset-1 rounded-full border border-dashed border-primary-glow/20 animate-spin-slow" />
+                <span className="text-[10px] tracking-widest text-primary font-mono font-bold uppercase">Core</span>
+              </div>
+            </div>
+
+            {/* Interactive category buttons */}
+            {skillCategories.map((cat, i) => {
+              const pos = [
+                { left: "22%", top: "30%", colorGlow: "shadow-[0_0_25px_rgba(0,242,254,0.35)]", borderGlow: "border-[#00f2fe]/40" },  // Backend
+                { left: "78%", top: "25%", colorGlow: "shadow-[0_0_25px_rgba(99,102,241,0.35)]", borderGlow: "border-[#6366f1]/40" },  // Frontend
+                { left: "26%", top: "72.5%", colorGlow: "shadow-[0_0_25px_rgba(168,85,247,0.35)]", borderGlow: "border-[#a855f7]/40" },   // DBs
+                { left: "74%", top: "75%", colorGlow: "shadow-[0_0_25px_rgba(16,185,129,0.35)]", borderGlow: "border-[#10b981]/40" }   // DevOps
+              ][i];
+
+              const isSelected = selectedIdx === cat.id;
+
+              return (
+                <button
                   key={cat.id}
-                  position={nodePositions[i]}
-                  color={cat.color}
-                  name={cat.title}
-                  level={cat.level}
-                  type={cat.type}
-                  isSelected={selectedIdx === cat.id}
-                  onHover={() => {}}
                   onClick={() => setSelectedIdx(cat.id)}
-                />
-              ))}
-
-              <DriftingStars count={100} />
-
-              <OrbitControls enableZoom={false} enablePan={false} maxPolarAngle={Math.PI / 1.8} minPolarAngle={Math.PI / 2.5} />
-            </Canvas>
+                  style={{ left: pos.left, top: pos.top }}
+                  className="absolute -translate-x-[50%] -translate-y-[50%] z-20 flex flex-col items-center gap-2 group transition-all duration-300"
+                >
+                  <div 
+                    style={{ color: cat.color }}
+                    className={`w-12 h-12 rounded-full glass-card border border-borderGlass flex items-center justify-center text-xl shadow-lg transition-all duration-300 group-hover:scale-110 group-hover:border-white/20 ${
+                      isSelected 
+                        ? `${pos.borderGlow} ${pos.colorGlow} bg-slate-900 border-opacity-100 scale-110` 
+                        : "hover:bg-slate-900/40"
+                    }`}
+                  >
+                    <i className={`fab ${cat.icon}`} />
+                  </div>
+                  
+                  <div className="px-2.5 py-0.5 rounded-md glass-card border border-borderGlass text-[10px] font-bold text-textMain shadow-sm whitespace-nowrap">
+                    {cat.title} ({cat.level}%)
+                  </div>
+                </button>
+              );
+            })}
           </div>
-
 
           {/* Right: Glassmorphic Skill Detail sidebar panel */}
           <div className="lg:col-span-5 flex flex-col justify-between">
@@ -294,68 +184,55 @@ export const SkillsConstellation: React.FC<SkillsProps> = ({ lang }) => {
                 <div>
                   {/* Category Title & Icon */}
                   <div className="flex items-center gap-4 mb-6">
-                    <div
-                      className="w-12 h-12 rounded-xl flex items-center justify-center text-white"
-                      style={{ backgroundColor: `${activeSkill.color}20`, border: `1px solid ${activeSkill.color}50` }}
+                    <div 
+                      style={{ color: activeSkill.color }}
+                      className="w-12 h-12 rounded-2xl glass-card border border-borderGlass flex items-center justify-center text-2xl shadow-md"
                     >
-                      <i className={`fab ${activeSkill.icon} text-2xl`} style={{ color: activeSkill.color }} />
+                      <i className={`fab ${activeSkill.icon}`} />
                     </div>
                     <div>
-                      <h3 className="text-xl sm:text-2xl font-heading font-bold text-textMain leading-tight">
-                        {activeSkill.title}
-                      </h3>
-                      <p className="text-xs font-semibold tracking-widest uppercase" style={{ color: activeSkill.color }}>
-                        {activeSkill.level}% Mastered
-                      </p>
+                      <h3 className="text-xl font-bold text-textMain">{activeSkill.title}</h3>
+                      <span className="text-xs text-textMuted">{lang === 'fr' ? 'Niveau de maîtrise' : 'Mastery Level'}: {activeSkill.level}%</span>
                     </div>
-                  </div>
-
-                  {/* Level Progress Indicator Bar */}
-                  <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden mb-6">
-                    <motion.div
-                      className="h-full rounded-full"
-                      style={{ backgroundColor: activeSkill.color }}
-                      initial={{ width: 0 }}
-                      animate={{ width: `${activeSkill.level}%` }}
-                      transition={{ duration: 0.8, ease: 'easeOut' }}
-                    />
                   </div>
 
                   {/* Description */}
-                  <p className="text-textMuted text-sm mb-6 leading-relaxed">
+                  <p className="text-sm text-textMuted mb-8 leading-relaxed">
                     {activeSkill.desc}
                   </p>
 
-                  {/* Tech stack items tags list */}
-                  <h4 className="text-sm font-heading font-semibold text-textMain mb-3 uppercase tracking-wider">
-                    Technologies
-                  </h4>
-                  <div className="flex flex-wrap gap-2">
-                    {activeSkill.technos.map((tech, i) => (
-                      <span
-                        key={i}
-                        className="text-xs px-3 py-1.5 rounded-lg border border-borderGlass bg-white/5 text-textMuted transition-colors duration-300 hover:border-slate-400 hover:text-textMain"
-                      >
-                        {tech}
-                      </span>
-                    ))}
+                  {/* Technologies Tags List */}
+                  <div className="mb-6">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-textMuted mb-3">
+                      {lang === 'fr' ? 'Technologies clés' : 'Key Technologies'}
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
+                      {activeSkill.technos.map((tech, idx) => (
+                        <span
+                          key={idx}
+                          className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/5 border border-borderGlass text-textMain shadow-sm hover:bg-white/10 hover:border-white/10 transition-colors"
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </div>
 
-                <div className="mt-8 pt-4 border-t border-borderGlass flex justify-between items-center text-xs text-textMuted">
-                  <span>Selected Category: {activeSkill.title}</span>
-                  <div className="flex gap-1.5">
-                    {skillCategories.map((dot) => (
-                      <button
-                        key={dot.id}
-                        onClick={() => setSelectedIdx(dot.id)}
-                        className={`w-2.5 h-2.5 rounded-full transition-colors duration-300 ${
-                          selectedIdx === dot.id ? 'bg-primary-glow' : 'bg-slate-300 dark:bg-slate-700'
-                        }`}
-                        style={{ backgroundColor: selectedIdx === dot.id ? dot.color : undefined }}
-                        title={dot.title}
-                      />
-                    ))}
+                {/* Progress bar metrics */}
+                <div className="pt-4 border-t border-borderGlass mt-auto">
+                  <div className="flex justify-between text-xs font-semibold mb-2">
+                    <span className="text-textMuted">{lang === 'fr' ? 'Niveau d\'expertise' : 'Expertise Level'}</span>
+                    <span style={{ color: activeSkill.color }}>{activeSkill.level}%</span>
+                  </div>
+                  <div className="w-full h-2 rounded-full bg-white/5 border border-borderGlass overflow-hidden p-0.5">
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: `${activeSkill.level}%` }}
+                      transition={{ duration: 0.8, ease: "easeOut" }}
+                      style={{ backgroundColor: activeSkill.color }}
+                      className="h-full rounded-full shadow-inner"
+                    />
                   </div>
                 </div>
               </motion.div>

@@ -1,180 +1,134 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { translations, occupations } from '../i18n';
 import profileImg from '../assets/profile_upright.jpg';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { Points, PointMaterial } from '@react-three/drei';
 import { ArrowRight, Mail } from 'lucide-react';
-import { motion } from 'framer-motion';
-import * as THREE from 'three';
+import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 
 // --- 3D INTERACTIVE PARTICLE SYSTEM ---
 // --- 3D INTERACTIVE PARTICLE LAYER ---
-const ParticleLayer: React.FC<{
-  count: number;
-  color: string;
-  size: number;
-  radiusMin: number;
-  radiusMax: number;
-  speed: number;
-  mouse: React.MutableRefObject<{ x: number; y: number }>;
-  depthOffset: number;
-}> = ({ count, color, size, radiusMin, radiusMax, speed, mouse, depthOffset }) => {
-  const pointsRef = useRef<THREE.Points>(null);
+// --- FLOATING 2D BACKGROUND SHAPES & DUST ---
+interface Floating2DShapesProps {
+  x: any;
+  y: any;
+}
 
-  const [positions] = useState(() => {
-    const arr = new Float32Array(count * 3);
-    for (let i = 0; i < count; i++) {
-      const u = Math.random();
-      const v = Math.random();
-      const theta = u * 2.0 * Math.PI;
-      const phi = Math.acos(2.0 * v - 1.0);
-      const r = radiusMin + Math.random() * (radiusMax - radiusMin);
-      arr[i * 3] = r * Math.sin(phi) * Math.cos(theta);
-      arr[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
-      arr[i * 3 + 2] = r * Math.cos(phi) + depthOffset;
-    }
-    return arr;
-  });
-
-  useFrame((state) => {
-    if (!pointsRef.current) return;
-    const time = state.clock.getElapsedTime();
-    pointsRef.current.rotation.y = time * speed;
-    pointsRef.current.rotation.x = time * (speed * 0.6);
-
-    // Mouse parallax reaction
-    const targetX = mouse.current.x * (1.2 + speed * 8);
-    const targetY = mouse.current.y * (1.2 + speed * 8);
-    pointsRef.current.position.x += (targetX - pointsRef.current.position.x) * 0.05;
-    pointsRef.current.position.y += (-targetY - pointsRef.current.position.y) * 0.05;
-  });
-
+const Floating2DShapes: React.FC<Floating2DShapesProps> = ({ x, y }) => {
   return (
-    <Points ref={pointsRef} positions={positions} stride={3} limit={count}>
-      <PointMaterial
-        transparent
-        color={color}
-        size={size}
-        sizeAttenuation={true}
-        depthWrite={false}
-        blending={THREE.AdditiveBlending}
-      />
-    </Points>
-  );
-};
+    <motion.div 
+      className="absolute inset-0 z-0 pointer-events-none overflow-hidden select-none"
+      style={{ x, y }}
+    >
+      {/* Torus / Ring Outline */}
+      <motion.div
+        className="absolute top-[20%] left-[10%] w-32 h-32 opacity-[0.12] text-primary"
+        animate={{
+          y: [0, -12, 0],
+          rotate: [0, 360],
+        }}
+        transition={{
+          duration: 25,
+          repeat: Infinity,
+          ease: "linear",
+        }}
+      >
+        <svg viewBox="0 0 100 100" className="w-full h-full fill-none stroke-current" strokeWidth="1.5">
+          <circle cx="50" cy="50" r="40" strokeDasharray="6 4" />
+          <circle cx="50" cy="50" r="25" />
+        </svg>
+      </motion.div>
 
-// --- MULTI-LAYER NEBULA FIELD ---
-const ParticleField: React.FC<{ mouse: React.MutableRefObject<{ x: number; y: number }> }> = ({ mouse }) => {
-  return (
-    <group>
-      {/* Layer 1: Background star dust (Indigo) */}
-      <ParticleLayer
-        count={500}
-        color="#6366f1"
-        size={0.06}
-        radiusMin={7}
-        radiusMax={16}
-        speed={0.015}
-        mouse={mouse}
-        depthOffset={-4}
-      />
-      {/* Layer 2: Main orbiters (Cyan) */}
-      <ParticleLayer
-        count={300}
-        color="#00f2fe"
-        size={0.12}
-        radiusMin={5}
-        radiusMax={12}
-        speed={0.03}
-        mouse={mouse}
-        depthOffset={0}
-      />
-      {/* Layer 3: Foreground floaters (Purple) */}
-      <ParticleLayer
-        count={150}
-        color="#a855f7"
-        size={0.16}
-        radiusMin={3}
-        radiusMax={8}
-        speed={0.045}
-        mouse={mouse}
-        depthOffset={3}
-      />
-    </group>
-  );
-};
+      {/* Hexagon / Geometric Core Outline */}
+      <motion.div
+        className="absolute bottom-[20%] right-[12%] w-44 h-44 opacity-[0.1] text-secondary"
+        animate={{
+          y: [0, 15, 0],
+          rotate: [360, 0],
+        }}
+        transition={{
+          duration: 30,
+          repeat: Infinity,
+          ease: "linear",
+        }}
+      >
+        <svg viewBox="0 0 100 100" className="w-full h-full fill-none stroke-current" strokeWidth="1">
+          <polygon points="50,5 95,25 95,75 50,95 5,75 5,25" />
+          <line x1="50" y1="5" x2="50" y2="95" />
+          <line x1="5" y1="25" x2="95" y2="75" />
+          <line x1="95" y1="25" x2="5" y2="75" />
+        </svg>
+      </motion.div>
 
-// --- FLOATING BACKGROUND PARALLAX SHAPES ---
-const FloatingShapes: React.FC<{ mouse: React.MutableRefObject<{ x: number; y: number }> }> = ({ mouse }) => {
-  const shapesRef = useRef<THREE.Group>(null);
-  
-  useFrame((state, delta) => {
-    if (!shapesRef.current) return;
-    const time = state.clock.getElapsedTime();
-    
-    shapesRef.current.children.forEach((child, i) => {
-      child.rotation.x += delta * (0.05 + i * 0.02);
-      child.rotation.y += delta * (0.08 + i * 0.01);
-      child.position.y += Math.sin(time + i * 2) * 0.001;
-    });
+      {/* Tech Coordinate Crosshairs */}
+      <motion.div
+        className="absolute top-[55%] left-[8%] w-8 h-8 opacity-[0.15] text-textMuted"
+        animate={{
+          y: [0, 8, 0],
+        }}
+        transition={{
+          duration: 8,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+      >
+        <svg viewBox="0 0 20 20" className="w-full h-full stroke-current" strokeWidth="1.5">
+          <line x1="10" y1="2" x2="10" y2="18" />
+          <line x1="2" y1="10" x2="18" y2="10" />
+        </svg>
+      </motion.div>
 
-    const targetX = mouse.current.x * 2.0;
-    const targetY = mouse.current.y * 2.0;
-    shapesRef.current.position.x += (targetX - shapesRef.current.position.x) * 0.03;
-    shapesRef.current.position.y += (-targetY - shapesRef.current.position.y) * 0.03;
-  });
-
-  return (
-    <group ref={shapesRef}>
-      {/* Torus */}
-      <mesh position={[-6, 3, -3]}>
-        <torusGeometry args={[0.8, 0.25, 12, 48]} />
-        <meshPhysicalMaterial
-          color="#00f2fe"
-          roughness={0.2}
-          metalness={0.8}
-          transmission={0.6}
-          thickness={0.5}
-          wireframe
-        />
-      </mesh>
-      {/* Icosahedron */}
-      <mesh position={[6, -3, 1]}>
-        <icosahedronGeometry args={[0.9, 0]} />
-        <meshPhysicalMaterial
-          color="#a855f7"
-          roughness={0.2}
-          metalness={0.8}
-          transmission={0.5}
-          thickness={0.6}
-          wireframe
-        />
-      </mesh>
-      {/* Octahedron */}
-      <mesh position={[-5, -4, -2]}>
-        <octahedronGeometry args={[0.7, 0]} />
-        <meshPhysicalMaterial
-          color="#6366f1"
-          roughness={0.3}
-          metalness={0.7}
-          transmission={0.4}
-          thickness={0.4}
-          wireframe
-        />
-      </mesh>
-      {/* TorusKnot */}
-      <mesh position={[5, 4, -4]}>
-        <torusKnotGeometry args={[0.5, 0.15, 48, 6, 2, 3]} />
-        <meshPhysicalMaterial
-          color="#00f2fe"
-          roughness={0.2}
-          metalness={0.8}
-          transmission={0.6}
-          thickness={0.5}
-          wireframe
-        />
-      </mesh>
-    </group>
+      {/* Another crosshair on the right */}
+      <motion.div
+        className="absolute top-[30%] right-[10%] w-6 h-6 opacity-[0.15] text-textMuted"
+        animate={{
+          y: [0, -6, 0],
+        }}
+        transition={{
+          duration: 6,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+      >
+        <svg viewBox="0 0 20 20" className="w-full h-full stroke-current" strokeWidth="1.5">
+          <line x1="10" y1="4" x2="10" y2="16" />
+          <line x1="4" y1="10" x2="16" y2="10" />
+          <circle cx="10" cy="10" r="3" fill="none" />
+        </svg>
+      </motion.div>
+      
+      {/* Drifting glowing ambient dust particles */}
+      <div className="absolute inset-0">
+        {[...Array(20)].map((_, i) => {
+          const size = Math.random() * 3 + 2;
+          const left = Math.random() * 100;
+          const top = Math.random() * 100;
+          const delay = Math.random() * 5;
+          const duration = Math.random() * 6 + 5;
+          return (
+            <motion.div
+              key={i}
+              className="absolute bg-primary-glow/40 rounded-full"
+              style={{
+                width: size,
+                height: size,
+                left: `${left}%`,
+                top: `${top}%`,
+                boxShadow: "0 0 6px rgba(0, 242, 254, 0.4)",
+              }}
+              animate={{
+                opacity: [0.15, 0.5, 0.15],
+                scale: [0.9, 1.2, 0.9],
+              }}
+              transition={{
+                duration,
+                repeat: Infinity,
+                delay,
+                ease: "easeInOut",
+              }}
+            />
+          );
+        })}
+      </div>
+    </motion.div>
   );
 };
 
@@ -186,22 +140,31 @@ interface Hero3DProps {
 
 export const Hero3D: React.FC<Hero3DProps> = ({ lang }) => {
   const t = translations[lang];
-  const mouse = useRef({ x: 0, y: 0 });
   const [typewriterText, setTypewriterText] = useState('');
   const [occIndex, setOccIndex] = useState(0);
   const [charIndex, setCharIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
   const [typingSpeed, setTypingSpeed] = useState(100);
 
-  // Mouse move listener to update coordinates for 3D camera reactivity
+  // High-performance Framer Motion coordinates for 2D parallax
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  const springX = useSpring(mouseX, { stiffness: 80, damping: 25 });
+  const springY = useSpring(mouseY, { stiffness: 80, damping: 25 });
+
+  const translateX = useTransform(springX, [-1, 1], [-15, 15]);
+  const translateY = useTransform(springY, [-1, 1], [-15, 15]);
+
+  // Mouse move listener to update coordinates for 2D parallax reactivity
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      mouse.current.x = (e.clientX / window.innerWidth) * 2 - 1;
-      mouse.current.y = -(e.clientY / window.innerHeight) * 2 + 1;
+      mouseX.set((e.clientX / window.innerWidth) * 2 - 1);
+      mouseY.set(-(e.clientY / window.innerHeight) * 2 + 1);
     };
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
+  }, [mouseX, mouseY]);
 
   // Typewriter effect logic
   useEffect(() => {
@@ -245,17 +208,8 @@ export const Hero3D: React.FC<Hero3DProps> = ({ lang }) => {
 
   return (
     <section id="hero" className="relative min-h-screen w-full flex items-center justify-center overflow-hidden pt-24 bg-bgDark">
-      {/* 3D R3F Canvas Container */}
-      <div className="absolute inset-0 z-0">
-        <Canvas camera={{ position: [0, 0, 15], fov: 60 }} dpr={[1, 1.5]}>
-          <ambientLight intensity={0.25} />
-          <pointLight position={[8, 8, 8]} intensity={1.5} color="#00f2fe" />
-          <pointLight position={[-8, -8, -8]} intensity={1.0} color="#a855f7" />
-          <pointLight position={[0, 8, -4]} intensity={1.2} color="#6366f1" />
-          <ParticleField mouse={mouse} />
-          <FloatingShapes mouse={mouse} />
-        </Canvas>
-      </div>
+      {/* 2D Animated Constellation Backdrop */}
+      <Floating2DShapes x={translateX} y={translateY} />
 
       {/* Aurora Radial Backdrop */}
       <div className="absolute inset-0 bg-radial pointer-events-none z-0 opacity-40 mix-blend-screen" 
