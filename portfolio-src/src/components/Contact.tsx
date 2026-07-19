@@ -222,7 +222,7 @@ export const Contact: React.FC<ContactProps> = ({ lang }) => {
                       {t['contact-label-loc']}
                     </h4>
                     <p className="text-sm text-textMuted">
-                      Paris, France / Maroc
+                      Paris, France
                     </p>
                   </div>
                 </div>
