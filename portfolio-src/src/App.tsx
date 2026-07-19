@@ -66,6 +66,14 @@ export const App: React.FC = () => {
     };
   }, []);
 
+  // Force scroll to top on every page load — disable browser's scroll memory
+  useEffect(() => {
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  }, []);
+
   const toggleTheme = () => {
     setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
   };
