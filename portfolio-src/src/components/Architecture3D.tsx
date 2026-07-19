@@ -115,7 +115,7 @@ const ArchNode: React.FC<ArchNodeProps> = ({
         )}
 
         <Html distanceFactor={10} position={[0, type === 'db' ? -0.8 : 0.8, 0]} center>
-          <div className="px-3 py-1 rounded-md glass-card text-xs font-bold text-white whitespace-nowrap pointer-events-none select-none border border-white/5 shadow-lg">
+          <div className="px-3 py-1 rounded-md glass-card text-xs font-bold text-textMain whitespace-nowrap pointer-events-none select-none border border-borderGlass shadow-lg">
             {label}
           </div>
         </Html>
@@ -241,10 +241,10 @@ export const Architecture3D: React.FC<ArchitectureProps> = ({ lang }) => {
     <section id="gallery" className="relative py-24 max-w-7xl mx-auto px-6 z-10">
       {/* Title */}
       <div className="text-center mb-6">
-        <h2 className="text-3xl sm:text-5xl font-heading font-bold mb-4 text-white">
+        <h2 className="text-3xl sm:text-5xl font-heading font-bold mb-4 text-textMain">
           {lang === 'fr' ? 'Architecture 3D Interactive' : 'Interactive 3D Architecture'}
         </h2>
-        <p className="text-slate-400 max-w-2xl mx-auto text-sm sm:text-base mb-12">
+        <p className="text-textMuted max-w-2xl mx-auto text-sm sm:text-base mb-12">
           {lang === 'fr' 
             ? "Visualisation tridimensionnelle du monolithe modulaire implémenté pour mes applications, montrant les flux de requêtes et de données."
             : "Three-dimensional visualization of the modular monolith architecture, displaying request routing and transactional data packets."}
@@ -253,7 +253,7 @@ export const Architecture3D: React.FC<ArchitectureProps> = ({ lang }) => {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
         {/* Left: Interactive 3D Canvas */}
-        <div className="lg:col-span-7 h-[450px] lg:h-[550px] glass-card rounded-3xl overflow-hidden relative border border-white/5 bg-bgDark/40">
+        <div className="lg:col-span-7 h-[450px] lg:h-[550px] glass-card rounded-3xl overflow-hidden relative border border-borderGlass bg-bgDark/40">
           <Canvas camera={{ position: [0, 0, 8], fov: 60 }} dpr={[1, 1.5]}>
             <ambientLight intensity={0.7} />
             <pointLight position={[10, 10, 10]} intensity={1.5} />
@@ -297,7 +297,7 @@ export const Architecture3D: React.FC<ArchitectureProps> = ({ lang }) => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -15 }}
               transition={{ duration: 0.3 }}
-              className="glass-card p-8 rounded-3xl h-full border border-white/5 flex flex-col justify-between"
+              className="glass-card p-8 rounded-3xl h-full border border-borderGlass flex flex-col justify-between"
             >
               <div>
                 <span 
@@ -311,21 +311,21 @@ export const Architecture3D: React.FC<ArchitectureProps> = ({ lang }) => {
                   {nodes[activeNode as keyof typeof nodes].type}
                 </span>
 
-                <h3 className="text-xl sm:text-3xl font-heading font-bold text-white mb-4 mt-2">
+                <h3 className="text-xl sm:text-3xl font-heading font-bold text-textMain mb-4 mt-2">
                   {activeDetail.title[lang]}
                 </h3>
 
-                <p className="text-slate-300 text-sm sm:text-base leading-relaxed mb-6">
+                <p className="text-textMuted text-sm sm:text-base leading-relaxed mb-6">
                   {activeDetail.desc[lang]}
                 </p>
 
-                <h4 className="text-xs font-heading font-bold uppercase tracking-wider text-slate-400 mb-3">
+                <h4 className="text-xs font-heading font-bold uppercase tracking-wider text-textMuted mb-3">
                   {lang === 'fr' ? 'Caractéristiques clés' : 'Key Specifications'}
                 </h4>
                 
                 <ul className="space-y-2">
                   {activeDetail.list.map((item, idx) => (
-                    <li key={idx} className="flex items-center gap-2.5 text-sm text-slate-300">
+                    <li key={idx} className="flex items-center gap-2.5 text-sm text-textMuted">
                       <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: nodes[activeNode as keyof typeof nodes].color }} />
                       {item}
                     </li>
@@ -333,7 +333,7 @@ export const Architecture3D: React.FC<ArchitectureProps> = ({ lang }) => {
                 </ul>
               </div>
 
-              <div className="text-xs text-slate-500 mt-8 pt-4 border-t border-white/5">
+              <div className="text-xs text-textMuted mt-8 pt-4 border-t border-borderGlass">
                 {lang === 'fr' 
                   ? "*Cliquez sur un autre nœud 3D pour voir ses détails."
                   : "*Click on other 3D nodes to view their responsibilities."}

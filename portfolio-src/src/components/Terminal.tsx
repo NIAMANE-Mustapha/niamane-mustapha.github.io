@@ -211,7 +211,7 @@ export const Terminal: React.FC<TerminalProps> = ({ lang, setLang, theme, toggle
   return (
     <section className="relative py-24 max-w-5xl mx-auto px-6 z-10">
       <div 
-        className="glass-card rounded-2xl overflow-hidden border border-white/10 shadow-2xl crt-screen text-left"
+        className="bg-slate-950 rounded-2xl overflow-hidden border border-borderGlass shadow-2xl crt-screen text-left"
         onClick={handleConsoleClick}
       >
         {/* Console Title Bar */}

@@ -38,9 +38,20 @@
   }
 
   body {
-    @apply bg-bgDark text-slate-100 font-body transition-colors duration-500 overflow-x-hidden;
+    @apply bg-bgDark font-body transition-colors duration-500 overflow-x-hidden;
     background-color: var(--bg-dark);
     color: var(--text-main);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text-main);
+  }
+
+  p {
+    color: var(--text-muted);
   }
 
   /* Custom Scrollbar */

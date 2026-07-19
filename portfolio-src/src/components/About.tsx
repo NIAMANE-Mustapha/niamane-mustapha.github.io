@@ -38,7 +38,7 @@ const CountUpNumber: React.FC<{ target: number; suffix?: string }> = ({ target, 
   }, [isInView, target]);
 
   return (
-    <div ref={ref} className="text-4xl sm:text-5xl font-heading font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-primary-glow">
+    <div ref={ref} className="text-4xl sm:text-5xl font-heading font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-slate-900 dark:from-white to-primary-glow">
       {count}{suffix}
     </div>
   );
@@ -71,27 +71,27 @@ export const About: React.FC<AboutProps> = ({ lang }) => {
           </h3>
           
           <p 
-            className="text-slate-300 leading-relaxed text-base sm:text-lg"
+            className="text-textMuted leading-relaxed text-base sm:text-lg"
             dangerouslySetInnerHTML={{ __html: t['about-p1'] }}
           />
           
           <p 
-            className="text-slate-300 leading-relaxed text-base sm:text-lg"
+            className="text-textMuted leading-relaxed text-base sm:text-lg"
             dangerouslySetInnerHTML={{ __html: t['about-p2'] }}
           />
 
           {/* Personal Info Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-white/5">
-            <div className="text-sm text-slate-400">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-borderGlass">
+            <div className="text-sm text-textMuted">
               <span dangerouslySetInnerHTML={{ __html: t['about-info-loc'] }} />
             </div>
-            <div className="text-sm text-slate-400">
+            <div className="text-sm text-textMuted">
               <span dangerouslySetInnerHTML={{ __html: t['about-info-email'] }} />
             </div>
-            <div className="text-sm text-slate-400">
+            <div className="text-sm text-textMuted">
               <span dangerouslySetInnerHTML={{ __html: t['about-info-phone'] }} />
             </div>
-            <div className="text-sm text-slate-400">
+            <div className="text-sm text-textMuted">
               <span dangerouslySetInnerHTML={{ __html: t['about-info-spec'] }} />
             </div>
           </div>
@@ -108,7 +108,7 @@ export const About: React.FC<AboutProps> = ({ lang }) => {
           {/* Stat Card 1 */}
           <div className="glass-card glass-card-hover p-6 rounded-2xl flex flex-col items-center justify-center text-center">
             <CountUpNumber target={3} suffix="+" />
-            <p className="text-xs font-semibold tracking-wider text-slate-400 uppercase mt-3 leading-tight">
+            <p className="text-xs font-semibold tracking-wider text-textMuted uppercase mt-3 leading-tight">
               {t['about-stat-exp']}
             </p>
           </div>
@@ -116,7 +116,7 @@ export const About: React.FC<AboutProps> = ({ lang }) => {
           {/* Stat Card 2 */}
           <div className="glass-card glass-card-hover p-6 rounded-2xl flex flex-col items-center justify-center text-center">
             <CountUpNumber target={15} suffix="+" />
-            <p className="text-xs font-semibold tracking-wider text-slate-400 uppercase mt-3 leading-tight">
+            <p className="text-xs font-semibold tracking-wider text-textMuted uppercase mt-3 leading-tight">
               {t['about-stat-projects']}
             </p>
           </div>
@@ -124,7 +124,7 @@ export const About: React.FC<AboutProps> = ({ lang }) => {
           {/* Stat Card 3 */}
           <div className="glass-card glass-card-hover p-6 rounded-2xl flex flex-col items-center justify-center text-center">
             <CountUpNumber target={100} suffix="%" />
-            <p className="text-xs font-semibold tracking-wider text-slate-400 uppercase mt-3 leading-tight">
+            <p className="text-xs font-semibold tracking-wider text-textMuted uppercase mt-3 leading-tight">
               {t['about-stat-passion']}
             </p>
           </div>
@@ -132,7 +132,7 @@ export const About: React.FC<AboutProps> = ({ lang }) => {
           {/* Stat Card 4 */}
           <div className="glass-card glass-card-hover p-6 rounded-2xl flex flex-col items-center justify-center text-center">
             <CountUpNumber target={80} suffix="%" />
-            <p className="text-xs font-semibold tracking-wider text-slate-400 uppercase mt-3 leading-tight">
+            <p className="text-xs font-semibold tracking-wider text-textMuted uppercase mt-3 leading-tight">
               {t['about-stat-speed']}
             </p>
           </div>

@@ -8,13 +8,17 @@ export default {
   theme: {
     extend: {
       colors: {
-        bgDark: '#070b13',
+        bgDark: 'var(--bg-dark)',
         primary: {
-          DEFAULT: '#11637B',
-          glow: '#00f2fe',
+          DEFAULT: 'var(--primary)',
+          glow: 'var(--primary-glow)',
         },
-        secondary: '#6366f1',
-        accent: '#a855f7',
+        secondary: 'var(--secondary)',
+        accent: 'var(--accent)',
+        textMain: 'var(--text-main)',
+        textMuted: 'var(--text-muted)',
+        borderGlass: 'var(--border-glass)',
+        borderGlow: 'var(--border-glow)',
       },
       fontFamily: {
         heading: ['Space Grotesk', 'sans-serif'],

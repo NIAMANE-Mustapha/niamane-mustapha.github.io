@@ -25,13 +25,16 @@ export const App: React.FC = () => {
     return (saved === 'light' ? 'light' : 'dark');
   });
 
-  // Sync theme status on body element
+  // Sync theme status on body and HTML element
   useEffect(() => {
+    const root = window.document.documentElement;
     if (theme === 'light') {
       document.body.classList.add('light-mode');
+      root.classList.remove('dark');
       localStorage.setItem('portfolio-theme', 'light');
     } else {
       document.body.classList.remove('light-mode');
+      root.classList.add('dark');
       localStorage.setItem('portfolio-theme', 'dark');
     }
   }, [theme]);
@@ -68,7 +71,7 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="relative min-h-screen bg-bgDark text-slate-100 overflow-x-hidden selection:bg-primary-glow selection:text-bgDark">
+    <div className="relative min-h-screen bg-bgDark text-textMain overflow-x-hidden selection:bg-primary-glow selection:text-bgDark">
       {/* Animated Mesh Gradients Backdrop */}
       <div className="aurora-bg" />
 

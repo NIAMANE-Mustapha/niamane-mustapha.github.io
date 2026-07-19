@@ -168,7 +168,7 @@ export const SkillsConstellation: React.FC<SkillsProps> = ({ lang }) => {
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         {/* Section Heading */}
         <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-5xl font-heading font-bold mb-4 relative inline-block text-white">
+          <h2 className="text-3xl sm:text-5xl font-heading font-bold mb-4 relative inline-block text-textMain">
             {t['skills-title']}
             <span className="block w-16 h-1 bg-gradient-to-r from-primary to-primary-glow mx-auto mt-3 rounded-full" />
           </h2>
@@ -176,8 +176,8 @@ export const SkillsConstellation: React.FC<SkillsProps> = ({ lang }) => {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
           {/* Left: 3D interactive Skill Constellation Graph */}
-          <div className="lg:col-span-7 h-[400px] lg:h-[500px] glass-card rounded-3xl overflow-hidden relative border border-white/5">
-            <div className="absolute top-4 left-6 z-10 text-xs font-semibold text-slate-400 select-none">
+          <div className="lg:col-span-7 h-[400px] lg:h-[500px] glass-card rounded-3xl overflow-hidden relative border border-borderGlass">
+            <div className="absolute top-4 left-6 z-10 text-xs font-semibold text-textMuted select-none">
               &lt; Drag to rotate, click nodes to inspect &gt;
             </div>
 
@@ -222,7 +222,7 @@ export const SkillsConstellation: React.FC<SkillsProps> = ({ lang }) => {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.4 }}
-                className="glass-card p-8 rounded-3xl h-full border border-white/5 flex flex-col justify-between"
+                className="glass-card p-8 rounded-3xl h-full border border-borderGlass flex flex-col justify-between"
               >
                 <div>
                   {/* Category Title & Icon */}
@@ -234,7 +234,7 @@ export const SkillsConstellation: React.FC<SkillsProps> = ({ lang }) => {
                       <i className={`fab ${activeSkill.icon} text-2xl`} style={{ color: activeSkill.color }} />
                     </div>
                     <div>
-                      <h3 className="text-xl sm:text-2xl font-heading font-bold text-white leading-tight">
+                      <h3 className="text-xl sm:text-2xl font-heading font-bold text-textMain leading-tight">
                         {activeSkill.title}
                       </h3>
                       <p className="text-xs font-semibold tracking-widest uppercase" style={{ color: activeSkill.color }}>
@@ -255,19 +255,19 @@ export const SkillsConstellation: React.FC<SkillsProps> = ({ lang }) => {
                   </div>
 
                   {/* Description */}
-                  <p className="text-slate-400 text-sm mb-6 leading-relaxed">
+                  <p className="text-textMuted text-sm mb-6 leading-relaxed">
                     {activeSkill.desc}
                   </p>
 
                   {/* Tech stack items tags list */}
-                  <h4 className="text-sm font-heading font-semibold text-slate-200 mb-3 uppercase tracking-wider">
+                  <h4 className="text-sm font-heading font-semibold text-textMain mb-3 uppercase tracking-wider">
                     Technologies
                   </h4>
                   <div className="flex flex-wrap gap-2">
                     {activeSkill.technos.map((tech, i) => (
                       <span
                         key={i}
-                        className="text-xs px-3 py-1.5 rounded-lg border border-white/5 bg-white/5 text-slate-300 transition-colors duration-300 hover:border-slate-400 hover:text-white"
+                        className="text-xs px-3 py-1.5 rounded-lg border border-borderGlass bg-white/5 text-textMuted transition-colors duration-300 hover:border-slate-400 hover:text-textMain"
                       >
                         {tech}
                       </span>
@@ -275,7 +275,7 @@ export const SkillsConstellation: React.FC<SkillsProps> = ({ lang }) => {
                   </div>
                 </div>
 
-                <div className="mt-8 pt-4 border-t border-white/5 flex justify-between items-center text-xs text-slate-500">
+                <div className="mt-8 pt-4 border-t border-borderGlass flex justify-between items-center text-xs text-textMuted">
                   <span>Selected Category: {activeSkill.title}</span>
                   <div className="flex gap-1.5">
                     {skillCategories.map((dot) => (
@@ -283,7 +283,7 @@ export const SkillsConstellation: React.FC<SkillsProps> = ({ lang }) => {
                         key={dot.id}
                         onClick={() => setSelectedIdx(dot.id)}
                         className={`w-2.5 h-2.5 rounded-full transition-colors duration-300 ${
-                          selectedIdx === dot.id ? 'bg-primary-glow' : 'bg-slate-700'
+                          selectedIdx === dot.id ? 'bg-primary-glow' : 'bg-slate-300 dark:bg-slate-700'
                         }`}
                         style={{ backgroundColor: selectedIdx === dot.id ? dot.color : undefined }}
                         title={dot.title}

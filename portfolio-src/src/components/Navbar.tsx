@@ -104,8 +104,8 @@ export const Navbar: React.FC<NavbarProps> = ({ lang, setLang, theme, toggleThem
                 <a
                   href={`#${item.id}`}
                   onClick={(e) => handleNavClick(e, item.id)}
-                  className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-colors hover:text-white ${
-                    activeSection === item.id ? 'text-white' : 'text-slate-400'
+                  className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-colors hover:text-textMain ${
+                    activeSection === item.id ? 'text-textMain font-semibold' : 'text-textMuted'
                   }`}
                 >
                   {item.label}
@@ -127,9 +127,9 @@ export const Navbar: React.FC<NavbarProps> = ({ lang, setLang, theme, toggleThem
             >
               {lang === 'fr' ? (
                 // French flag mockup or simple indicator
-                <span className="text-xs font-bold text-slate-300">EN</span>
+                <span className="text-xs font-bold text-textMain">EN</span>
               ) : (
-                <span className="text-xs font-bold text-slate-300">FR</span>
+                <span className="text-xs font-bold text-textMain">FR</span>
               )}
             </button>
 
@@ -172,7 +172,7 @@ export const Navbar: React.FC<NavbarProps> = ({ lang, setLang, theme, toggleThem
                   href={`#${item.id}`}
                   onClick={(e) => handleNavClick(e, item.id)}
                   className={`block py-2 text-lg font-medium border-b border-white/5 transition-colors ${
-                    activeSection === item.id ? 'text-primary-glow' : 'text-slate-400'
+                    activeSection === item.id ? 'text-primary-glow' : 'text-textMuted'
                   }`}
                 >
                   {item.label}

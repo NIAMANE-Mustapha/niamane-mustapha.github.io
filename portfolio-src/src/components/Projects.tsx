@@ -103,10 +103,10 @@ const ProjectCard: React.FC<{ project: ProjectItem; lang: 'fr' | 'en'; onOpenMod
       {/* Info Group */}
       <div className="p-6 flex-grow flex flex-col justify-between">
         <div>
-          <h3 className="text-xl sm:text-2xl font-heading font-bold text-white mb-2.5">
+          <h3 className="text-xl sm:text-2xl font-heading font-bold text-textMain mb-2.5">
             {project.title[lang]}
           </h3>
-          <p className="text-slate-400 text-sm leading-relaxed mb-6">
+          <p className="text-textMuted text-sm leading-relaxed mb-6">
             {project.desc[lang].length > 130 ? `${project.desc[lang].substring(0, 130)}...` : project.desc[lang]}
           </p>
         </div>
@@ -117,7 +117,7 @@ const ProjectCard: React.FC<{ project: ProjectItem; lang: 'fr' | 'en'; onOpenMod
             {project.tags.slice(0, 3).map((tag, idx) => (
               <span
                 key={idx}
-                className="text-[10px] px-2.5 py-1 rounded-full border border-white/5 bg-white/5 text-slate-300"
+                className="text-[10px] px-2.5 py-1 rounded-full border border-borderGlass bg-white/5 text-textMuted"
               >
                 {tag}
               </span>
@@ -125,12 +125,12 @@ const ProjectCard: React.FC<{ project: ProjectItem; lang: 'fr' | 'en'; onOpenMod
           </div>
 
           {/* Links */}
-          <div className="pt-4 border-t border-white/5 flex items-center justify-between">
+          <div className="pt-4 border-t border-borderGlass flex items-center justify-between">
             <a
               href={project.link}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary-glow hover:text-white transition-colors"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary-glow hover:text-textMain transition-colors"
             >
               {project.link.includes('github.com') ? (
                 <>
@@ -162,7 +162,7 @@ export const Projects: React.FC<ProjectsProps> = ({ lang }) => {
       <div className="max-w-7xl mx-auto px-6 z-10 relative">
         {/* Title */}
         <div className="text-center mb-16">
-          <h2 className="text-3xl sm:text-5xl font-heading font-bold mb-4 relative inline-block text-white">
+          <h2 className="text-3xl sm:text-5xl font-heading font-bold mb-4 relative inline-block text-textMain">
             {t['proj-title']}
             <span className="block w-16 h-1 bg-gradient-to-r from-primary to-primary-glow mx-auto mt-3 rounded-full" />
           </h2>
@@ -186,9 +186,9 @@ export const Projects: React.FC<ProjectsProps> = ({ lang }) => {
             href="https://github.com/NIAMANE-Mustapha"
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-2.5 px-6 py-3 rounded-xl border border-white/5 bg-white/5 hover:bg-white/10 hover:border-primary-glow text-white font-semibold text-sm transition-all duration-300 magnetic"
+            className="inline-flex items-center gap-2.5 px-6 py-3 rounded-xl border border-borderGlass bg-white/5 text-textMain font-semibold text-sm transition-all duration-300 magnetic"
           >
-            <Github size={16} />
+            <i className="fab fa-github text-base" />
             {t['proj-more']}
           </a>
         </div>
@@ -213,12 +213,12 @@ export const Projects: React.FC<ProjectsProps> = ({ lang }) => {
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 30 }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="w-full max-w-4xl glass-card rounded-3xl overflow-hidden relative border border-white/10 z-10 shadow-2xl flex flex-col md:flex-row h-[90vh] md:h-auto max-h-[90vh]"
+              className="w-full max-w-4xl glass-card rounded-3xl overflow-hidden relative border border-borderGlass z-10 shadow-2xl flex flex-col md:flex-row h-[90vh] md:h-auto max-h-[90vh]"
             >
               {/* Close Button */}
               <button
                 onClick={() => setSelectedProject(null)}
-                className="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-bgDark/60 hover:bg-white/10 border border-white/5 text-white flex items-center justify-center transition-colors"
+                className="absolute top-4 right-4 z-20 w-10 h-10 rounded-full bg-bgDark/60 hover:bg-white/10 border border-borderGlass text-textMain flex items-center justify-center transition-colors"
               >
                 <X size={18} />
               </button>
@@ -235,21 +235,21 @@ export const Projects: React.FC<ProjectsProps> = ({ lang }) => {
               {/* Right Side: Information Panels */}
               <div className="w-full md:w-1/2 p-8 flex flex-col justify-between overflow-y-auto">
                 <div>
-                  <h3 className="text-2xl sm:text-3xl font-heading font-extrabold text-white mb-4">
+                  <h3 className="text-2xl sm:text-3xl font-heading font-extrabold text-textMain mb-4">
                     {selectedProject.title[lang]}
                   </h3>
-                  <p className="text-slate-300 text-sm sm:text-base leading-relaxed mb-6">
+                  <p className="text-textMuted text-sm sm:text-base leading-relaxed mb-6">
                     {selectedProject.desc[lang]}
                   </p>
 
-                  <h4 className="text-xs font-heading font-bold uppercase tracking-wider text-slate-400 mb-3">
+                  <h4 className="text-xs font-heading font-bold uppercase tracking-wider text-textMuted mb-3">
                     Technologies
                   </h4>
                   <div className="flex flex-wrap gap-1.5 mb-8">
                     {selectedProject.tags.map((tag, idx) => (
                       <span
                         key={idx}
-                        className="text-xs px-3 py-1 rounded-lg border border-white/5 bg-white/5 text-slate-300"
+                        className="text-xs px-3 py-1 rounded-lg border border-borderGlass bg-white/5 text-textMuted"
                       >
                         {tag}
                       </span>

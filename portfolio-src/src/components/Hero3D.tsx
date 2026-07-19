@@ -152,7 +152,7 @@ export const Hero3D: React.FC<Hero3DProps> = ({ lang }) => {
           </div>
 
           {/* Title */}
-          <h1 className="text-4xl sm:text-5xl lg:text-7xl font-heading font-extrabold tracking-tight leading-[1.08] mb-4 text-white">
+          <h1 className="text-4xl sm:text-5xl lg:text-7xl font-heading font-extrabold tracking-tight leading-[1.08] mb-4 text-textMain">
             {t['hero-greeting']} <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-glow via-secondary to-accent">
               Mustapha NIAMANE
@@ -160,13 +160,13 @@ export const Hero3D: React.FC<Hero3DProps> = ({ lang }) => {
           </h1>
 
           {/* Subtitle / Typewriter */}
-          <h2 className="text-lg sm:text-2xl font-medium text-slate-400 mb-6 min-h-[40px] flex items-center">
-            <span className="text-slate-100 font-semibold">{typewriterText}</span>
+          <h2 className="text-lg sm:text-2xl font-medium text-textMuted mb-6 min-h-[40px] flex items-center">
+            <span className="text-textMain font-semibold">{typewriterText}</span>
             <span className="w-[3px] h-[24px] bg-primary-glow ml-1.5 blink-cursor inline-block" />
           </h2>
 
           {/* Paragraph */}
-          <p className="text-base sm:text-lg text-slate-400 max-w-xl mb-8 leading-relaxed">
+          <p className="text-base sm:text-lg text-textMuted max-w-xl mb-8 leading-relaxed">
             {t['hero-subtitle']}
           </p>
 
@@ -182,7 +182,7 @@ export const Hero3D: React.FC<Hero3DProps> = ({ lang }) => {
             </a>
             <a
               href="#contact"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-lg border border-white/10 hover:border-white/30 text-white font-semibold text-sm hover:bg-white/5 transition-all duration-300 transform hover:-translate-y-0.5 magnetic"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-lg border border-borderGlass hover:border-slate-400 dark:hover:border-white/30 text-textMain font-semibold text-sm hover:bg-white/5 transition-all duration-300 transform hover:-translate-y-0.5 magnetic"
             >
               {t['hero-btn-contact']}
               <Mail size={16} />
