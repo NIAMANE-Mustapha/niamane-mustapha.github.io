@@ -38,7 +38,7 @@ const CountUpNumber: React.FC<{ target: number; suffix?: string }> = ({ target, 
   }, [isInView, target]);
 
   return (
-    <div ref={ref} className="text-4xl sm:text-5xl font-heading font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-slate-900 dark:from-white to-primary-glow">
+    <div ref={ref} className="text-4xl sm:text-5xl font-heading font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-textMain to-primary-glow">
       {count}{suffix}
     </div>
   );
@@ -51,7 +51,7 @@ export const About: React.FC<AboutProps> = ({ lang }) => {
     <section id="about" className="relative py-24 px-6 max-w-7xl mx-auto z-10">
       {/* Title */}
       <div className="text-center mb-16">
-        <h2 className="text-3xl sm:text-5xl font-heading font-bold mb-4 relative inline-block text-white">
+        <h2 className="text-3xl sm:text-5xl font-heading font-bold mb-4 relative inline-block text-textMain">
           {t['about-title']}
           <span className="block w-16 h-1 bg-gradient-to-r from-primary to-primary-glow mx-auto mt-3 rounded-full" />
         </h2>
