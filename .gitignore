@@ -24,3 +24,5 @@ dist-ssr
 *.sw?
 *.backup
 
+.agents/
+temp-clone/

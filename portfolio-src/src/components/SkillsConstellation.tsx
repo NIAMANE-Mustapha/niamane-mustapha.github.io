@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { translations } from '../i18n';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Html } from '@react-three/drei';
+import { OrbitControls, Html, Points, PointMaterial } from '@react-three/drei';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as THREE from 'three';
 
@@ -14,6 +14,7 @@ interface NodeProps {
   isSelected: boolean;
   onHover: (hovered: boolean) => void;
   onClick: () => void;
+  type: string;
 }
 
 const ConstellationNode: React.FC<NodeProps> = ({
@@ -24,16 +25,21 @@ const ConstellationNode: React.FC<NodeProps> = ({
   isSelected,
   onHover,
   onClick,
+  type,
 }) => {
   const meshRef = useRef<THREE.Mesh>(null);
   const [hovered, setHovered] = useState(false);
 
-  // Organic bounce/float animation
-  useFrame((state) => {
+  // Organic bounce/float and continuous spin animation
+  useFrame((state, delta) => {
     if (!meshRef.current) return;
     const time = state.clock.getElapsedTime();
     const offset = position[0] * 10; // offset based on position
-    meshRef.current.position.y = position[1] + Math.sin(time + offset) * 0.15;
+    meshRef.current.position.y = position[1] + Math.sin(time + offset) * 0.12;
+    
+    // Slow rotational spin
+    meshRef.current.rotation.x += delta * 0.35;
+    meshRef.current.rotation.y += delta * 0.22;
   });
 
   return (
@@ -56,28 +62,43 @@ const ConstellationNode: React.FC<NodeProps> = ({
           onHover(false);
         }}
       >
-        <sphereGeometry args={[isSelected ? 0.7 : hovered ? 0.6 : 0.45, 32, 32]} />
-        <meshBasicMaterial
-          color={hovered || isSelected ? color : '#334155'}
-          wireframe={!isSelected && !hovered}
+        {type === 'backend' && <dodecahedronGeometry args={[isSelected ? 0.72 : hovered ? 0.62 : 0.5, 0]} />}
+        {type === 'frontend' && <icosahedronGeometry args={[isSelected ? 0.72 : hovered ? 0.62 : 0.5, 0]} />}
+        {type === 'db' && <cylinderGeometry args={[isSelected ? 0.55 : hovered ? 0.46 : 0.36, isSelected ? 0.55 : hovered ? 0.46 : 0.36, 0.75, 6]} />}
+        {type === 'devops' && <torusKnotGeometry args={[isSelected ? 0.38 : hovered ? 0.32 : 0.25, 0.08, 48, 8, 2, 3]} />}
+
+        <meshPhysicalMaterial
+          color={hovered || isSelected ? color : '#475569'}
+          roughness={0.15}
+          metalness={0.8}
+          clearcoat={1.0}
+          clearcoatRoughness={0.1}
+          transmission={0.45}
+          thickness={0.6}
+          ior={1.45}
+          flatShading={type !== 'devops'} // clean faceted look for nodes, smooth for torus knot
         />
         
         {/* Glowing halo indicator */}
         {(hovered || isSelected) && (
           <mesh>
-            <sphereGeometry args={[isSelected ? 0.9 : 0.75, 16, 16]} />
+            {type === 'backend' && <dodecahedronGeometry args={[isSelected ? 0.9 : 0.78, 0]} />}
+            {type === 'frontend' && <icosahedronGeometry args={[isSelected ? 0.9 : 0.78, 0]} />}
+            {type === 'db' && <cylinderGeometry args={[isSelected ? 0.72 : 0.6, isSelected ? 0.72 : 0.6, 0.95, 6]} />}
+            {type === 'devops' && <torusKnotGeometry args={[isSelected ? 0.5 : 0.42, 0.12, 48, 8, 2, 3]} />}
             <meshBasicMaterial
               color={color}
               transparent
-              opacity={0.15}
+              opacity={0.12}
               blending={THREE.AdditiveBlending}
+              wireframe
             />
           </mesh>
         )}
 
         {/* 3D Label Overlay */}
-        <Html distanceFactor={10} position={[0, 1.2, 0]} center>
-          <div className="px-3 py-1 rounded-md glass-card text-xs font-semibold text-white whitespace-nowrap pointer-events-none select-none border border-white/5 shadow-md">
+        <Html distanceFactor={10} position={[0, type === 'db' ? 0.9 : 1.1, 0]} center>
+          <div className="px-3 py-1 rounded-md glass-card text-xs font-semibold text-textMain whitespace-nowrap pointer-events-none select-none border border-borderGlass shadow-md">
             {name} ({level}%)
           </div>
         </Html>
@@ -95,8 +116,43 @@ const ConnectingLines: React.FC<{ points: [number, number, number][] }> = ({ poi
   return (
     // @ts-ignore
     <line geometry={lineGeometry}>
-      <lineBasicMaterial color="rgba(99, 102, 241, 0.2)" linewidth={1} />
+      <lineBasicMaterial color="rgba(99, 102, 241, 0.15)" linewidth={1} />
     </line>
+  );
+};
+
+// --- DRIFTING STARS BACKGROUND ---
+const DriftingStars: React.FC<{ count: number }> = ({ count }) => {
+  const pointsRef = useRef<THREE.Points>(null);
+
+  const [positions] = useState(() => {
+    const arr = new Float32Array(count * 3);
+    for (let i = 0; i < count; i++) {
+      arr[i * 3] = (Math.random() - 0.5) * 16;
+      arr[i * 3 + 1] = (Math.random() - 0.5) * 16;
+      arr[i * 3 + 2] = (Math.random() - 0.5) * 10 - 2;
+    }
+    return arr;
+  });
+
+  useFrame((state) => {
+    if (!pointsRef.current) return;
+    const time = state.clock.getElapsedTime();
+    pointsRef.current.rotation.y = time * 0.015;
+    pointsRef.current.rotation.x = time * 0.01;
+  });
+
+  return (
+    <Points ref={pointsRef} positions={positions} stride={3} limit={count}>
+      <PointMaterial
+        transparent
+        color="#a855f7"
+        size={0.05}
+        sizeAttenuation={true}
+        depthWrite={false}
+        blending={THREE.AdditiveBlending}
+      />
+    </Points>
   );
 };
 
@@ -125,6 +181,7 @@ export const SkillsConstellation: React.FC<SkillsProps> = ({ lang }) => {
       level: 90,
       color: '#00f2fe',
       icon: 'fa-php',
+      type: 'backend',
       technos: ['PHP', 'Laravel 11', 'API RESTful', 'Domain Driven Design (DDD)', 'MVC', 'JWT']
     },
     {
@@ -134,6 +191,7 @@ export const SkillsConstellation: React.FC<SkillsProps> = ({ lang }) => {
       level: 80,
       color: '#6366f1',
       icon: 'fa-js',
+      type: 'frontend',
       technos: ['JavaScript ES6+', 'TypeScript', 'React.js', 'Three.js', 'Tailwind CSS', 'HTML5 & CSS3']
     },
     {
@@ -143,6 +201,7 @@ export const SkillsConstellation: React.FC<SkillsProps> = ({ lang }) => {
       level: 85,
       color: '#a855f7',
       icon: 'fa-database',
+      type: 'db',
       technos: ['SQL / MySQL', 'MongoDB', 'Query Optimization', 'Indexing', 'Database Partitioning']
     },
     {
@@ -152,6 +211,7 @@ export const SkillsConstellation: React.FC<SkillsProps> = ({ lang }) => {
       level: 85,
       color: '#10b981',
       icon: 'fa-tools',
+      type: 'devops',
       technos: ['Git / GitHub', 'Docker', 'Linux / Nginx', 'CI/CD (GitHub Actions)', 'Scrum / Agile']
     }
   ];
@@ -182,8 +242,11 @@ export const SkillsConstellation: React.FC<SkillsProps> = ({ lang }) => {
             </div>
 
             <Canvas camera={{ position: [0, 0, 7.5], fov: 60 }} dpr={[1, 1.5]}>
-              <ambientLight intensity={0.8} />
-              <pointLight position={[10, 10, 10]} intensity={1.5} />
+              <ambientLight intensity={0.25} />
+              <pointLight position={[5, 5, 5]} intensity={1.5} color="#00f2fe" />
+              <pointLight position={[-5, -5, -5]} intensity={1.0} color="#6366f1" />
+              <pointLight position={[0, -5, 3]} intensity={0.8} color="#a855f7" />
+              <directionalLight position={[0, 5, 0]} intensity={1.2} color="#ffffff" />
               
               {/* Connect nodes with line threads */}
               <ConnectingLines points={[
@@ -203,15 +266,19 @@ export const SkillsConstellation: React.FC<SkillsProps> = ({ lang }) => {
                   color={cat.color}
                   name={cat.title}
                   level={cat.level}
+                  type={cat.type}
                   isSelected={selectedIdx === cat.id}
                   onHover={() => {}}
                   onClick={() => setSelectedIdx(cat.id)}
                 />
               ))}
 
+              <DriftingStars count={100} />
+
               <OrbitControls enableZoom={false} enablePan={false} maxPolarAngle={Math.PI / 1.8} minPolarAngle={Math.PI / 2.5} />
             </Canvas>
           </div>
+
 
           {/* Right: Glassmorphic Skill Detail sidebar panel */}
           <div className="lg:col-span-5 flex flex-col justify-between">

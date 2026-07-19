@@ -34,16 +34,19 @@ const DataPacket: React.FC<{ packet: Packet; onComplete: (id: number) => void }>
 
   return (
     <mesh ref={meshRef}>
-      <sphereGeometry args={[0.08, 16, 16]} />
+      <sphereGeometry args={[0.09, 16, 16]} />
       <meshBasicMaterial color={packet.color} />
       {/* Light glow halo */}
       <mesh>
-        <sphereGeometry args={[0.16, 8, 8]} />
-        <meshBasicMaterial color={packet.color} transparent opacity={0.3} blending={THREE.AdditiveBlending} />
+        <sphereGeometry args={[0.22, 8, 8]} />
+        <meshBasicMaterial color={packet.color} transparent opacity={0.35} blending={THREE.AdditiveBlending} />
       </mesh>
+      {/* Tracing Light Source */}
+      <pointLight color={packet.color} intensity={2.0} distance={3.5} decay={2} />
     </mesh>
   );
 };
+
 
 // --- ARCHITECTURE NODE MESH ---
 interface ArchNodeProps {
@@ -66,17 +69,32 @@ const ArchNode: React.FC<ArchNodeProps> = ({
   onClick,
 }) => {
   const groupRef = useRef<THREE.Group>(null);
+  const gatewayCoreRef = useRef<THREE.Mesh>(null);
+  const gatewayRingRef = useRef<THREE.Mesh>(null);
+  const moduleCoreRef = useRef<THREE.Mesh>(null);
 
-  // Floating animation
-  useFrame((state) => {
+  // Floating animation & active node rotation
+  useFrame((state, delta) => {
     if (!groupRef.current) return;
     const time = state.clock.getElapsedTime();
-    groupRef.current.position.y = position[1] + Math.sin(time * 1.5 + position[0]) * 0.08;
+    groupRef.current.position.y = position[1] + Math.sin(time * 1.5 + position[0]) * 0.06;
+
+    if (gatewayCoreRef.current) {
+      gatewayCoreRef.current.rotation.y += delta * 0.8;
+      gatewayCoreRef.current.rotation.x += delta * 0.4;
+    }
+    if (gatewayRingRef.current) {
+      gatewayRingRef.current.rotation.z -= delta * 1.0;
+    }
+    if (moduleCoreRef.current) {
+      const scale = 1 + Math.sin(time * 5.0) * 0.12;
+      moduleCoreRef.current.scale.set(scale, scale, scale);
+    }
   });
 
   return (
     <group ref={groupRef} position={[position[0], 0, position[2]]}>
-      <mesh
+      <group
         position={[0, position[1], 0]}
         onClick={(e) => {
           e.stopPropagation();
@@ -91,35 +109,119 @@ const ArchNode: React.FC<ArchNodeProps> = ({
           onHover(false);
         }}
       >
-        {type === 'client' && <boxGeometry args={[1.2, 0.7, 0.2]} />}
-        {type === 'gateway' && <boxGeometry args={[0.9, 0.9, 0.9]} />}
-        {type === 'module' && <sphereGeometry args={[0.5, 32, 32]} />}
-        {type === 'db' && <cylinderGeometry args={[0.6, 0.6, 0.8, 32]} />}
+        {/* REACT CLIENT (Monitor Display Model) */}
+        {type === 'client' && (
+          <group>
+            {/* Monitor screen glass pane */}
+            <mesh>
+              <boxGeometry args={[1.3, 0.8, 0.1]} />
+              <meshPhysicalMaterial
+                color={isHovered ? color : '#334155'}
+                roughness={0.1}
+                metalness={0.9}
+                transmission={0.4}
+                thickness={0.5}
+              />
+            </mesh>
+            {/* Monitor stand */}
+            <mesh position={[0, -0.5, 0]}>
+              <cylinderGeometry args={[0.06, 0.12, 0.3, 16]} />
+              <meshStandardMaterial color="#475569" metalness={0.9} roughness={0.1} />
+            </mesh>
+            {/* Glowing Screen Content Display */}
+            <mesh position={[0, 0, 0.052]}>
+              <planeGeometry args={[1.18, 0.68]} />
+              <meshBasicMaterial color={isHovered ? color : '#1e293b'} toneMapped={false} />
+            </mesh>
+          </group>
+        )}
 
-        <meshStandardMaterial
-          color={isHovered ? color : '#334155'}
-          roughness={0.2}
-          metalness={0.8}
-          wireframe={!isHovered}
-        />
+        {/* API GATEWAY (Octahedron with Rotating Ring) */}
+        {type === 'gateway' && (
+          <group>
+            <mesh ref={gatewayCoreRef}>
+              <octahedronGeometry args={[0.55, 0]} />
+              <meshPhysicalMaterial
+                color={isHovered ? color : '#334155'}
+                roughness={0.1}
+                metalness={0.9}
+                clearcoat={1.0}
+                transmission={0.5}
+                thickness={0.7}
+              />
+            </mesh>
+            <mesh ref={gatewayRingRef} rotation={[Math.PI / 2.3, 0, 0]}>
+              <torusGeometry args={[0.78, 0.04, 8, 36]} />
+              <meshBasicMaterial color={isHovered ? color : '#475569'} />
+            </mesh>
+          </group>
+        )}
 
-        {/* Glow Halo */}
+        {/* SERVICE MODULES (Nested spheres with pulsing neon core) */}
+        {type === 'module' && (
+          <group>
+            <mesh>
+              <sphereGeometry args={[0.52, 32, 32]} />
+              <meshPhysicalMaterial
+                color={isHovered ? color : '#334155'}
+                roughness={0.05}
+                metalness={0.9}
+                transmission={0.7}
+                thickness={0.9}
+                ior={1.48}
+              />
+            </mesh>
+            <mesh ref={moduleCoreRef}>
+              <sphereGeometry args={[0.24, 16, 16]} />
+              <meshBasicMaterial color={color} toneMapped={false} />
+            </mesh>
+          </group>
+        )}
+
+        {/* MYSQL DATABASE (Stacked disk tower with neon rings) */}
+        {type === 'db' && (
+          <group>
+            <mesh position={[0, 0.32, 0]}>
+              <cylinderGeometry args={[0.55, 0.55, 0.18, 32]} />
+              <meshPhysicalMaterial color={isHovered ? color : '#334155'} roughness={0.15} metalness={0.9} />
+            </mesh>
+            <mesh position={[0, 0, 0]}>
+              <cylinderGeometry args={[0.55, 0.55, 0.18, 32]} />
+              <meshPhysicalMaterial color={isHovered ? color : '#334155'} roughness={0.15} metalness={0.9} />
+            </mesh>
+            <mesh position={[0, -0.32, 0]}>
+              <cylinderGeometry args={[0.55, 0.55, 0.18, 32]} />
+              <meshPhysicalMaterial color={isHovered ? color : '#334155'} roughness={0.15} metalness={0.9} />
+            </mesh>
+            {/* Glowing neon spacers between server cylinders */}
+            <mesh position={[0, 0.16, 0]}>
+              <cylinderGeometry args={[0.48, 0.48, 0.03, 16]} />
+              <meshBasicMaterial color={isHovered ? color : '#1e293b'} />
+            </mesh>
+            <mesh position={[0, -0.16, 0]}>
+              <cylinderGeometry args={[0.48, 0.48, 0.03, 16]} />
+              <meshBasicMaterial color={isHovered ? color : '#1e293b'} />
+            </mesh>
+          </group>
+        )}
+
+        {/* Glow halo underlay */}
         {isHovered && (
           <mesh>
-            {type === 'client' && <boxGeometry args={[1.4, 0.9, 0.3]} />}
-            {type === 'gateway' && <boxGeometry args={[1.1, 1.1, 1.1]} />}
-            {type === 'module' && <sphereGeometry args={[0.65, 16, 16]} />}
-            {type === 'db' && <cylinderGeometry args={[0.75, 0.75, 0.9, 16]} />}
-            <meshBasicMaterial color={color} transparent opacity={0.12} blending={THREE.AdditiveBlending} />
+            {type === 'client' && <boxGeometry args={[1.42, 0.92, 0.2]} />}
+            {type === 'gateway' && <sphereGeometry args={[0.82, 16, 16]} />}
+            {type === 'module' && <sphereGeometry args={[0.62, 16, 16]} />}
+            {type === 'db' && <cylinderGeometry args={[0.65, 0.65, 0.95, 16]} />}
+            <meshBasicMaterial color={color} transparent opacity={0.1} blending={THREE.AdditiveBlending} />
           </mesh>
         )}
 
-        <Html distanceFactor={10} position={[0, type === 'db' ? -0.8 : 0.8, 0]} center>
+        <Html distanceFactor={10} position={[0, type === 'db' ? -0.85 : type === 'client' ? 0.7 : 0.85, 0]} center>
           <div className="px-3 py-1 rounded-md glass-card text-xs font-bold text-textMain whitespace-nowrap pointer-events-none select-none border border-borderGlass shadow-lg">
             {label}
           </div>
         </Html>
-      </mesh>
+      </group>
     </group>
   );
 };
@@ -255,8 +357,11 @@ export const Architecture3D: React.FC<ArchitectureProps> = ({ lang }) => {
         {/* Left: Interactive 3D Canvas */}
         <div className="lg:col-span-7 h-[450px] lg:h-[550px] glass-card rounded-3xl overflow-hidden relative border border-borderGlass bg-bgDark/40">
           <Canvas camera={{ position: [0, 0, 8], fov: 60 }} dpr={[1, 1.5]}>
-            <ambientLight intensity={0.7} />
-            <pointLight position={[10, 10, 10]} intensity={1.5} />
+            <ambientLight intensity={0.25} />
+            <pointLight position={[6, 6, 6]} intensity={1.8} color="#00f2fe" />
+            <pointLight position={[-6, -6, -6]} intensity={1.2} color="#a855f7" />
+            <pointLight position={[0, -6, 2]} intensity={1.0} color="#10b981" />
+            <directionalLight position={[0, 6, 0]} intensity={1.5} color="#ffffff" />
             
             {/* Connections */}
             <FlowBeam start={nodes.client.pos} end={nodes.gateway.pos} />
