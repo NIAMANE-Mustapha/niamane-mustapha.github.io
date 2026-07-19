@@ -2,11 +2,64 @@ import React, { useState, useEffect, useRef } from 'react';
 import { translations, occupations } from '../i18n';
 import profileImg from '../assets/profile_upright.jpg';
 import { ArrowRight, Mail } from 'lucide-react';
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { motion, useMotionValue, useSpring, useTransform, useMotionTemplate } from 'framer-motion';
 
 // --- 3D INTERACTIVE PARTICLE SYSTEM ---
 // --- 3D INTERACTIVE PARTICLE LAYER ---
 // --- FLOATING 2D BACKGROUND SHAPES & DUST ---
+// --- DRIFTING 2D STAR FIELD WITH PARALLAX ---
+interface StarFieldProps {
+  springX: any;
+  springY: any;
+}
+
+const StarField: React.FC<StarFieldProps> = ({ springX, springY }) => {
+  const stars = useRef([...Array(25)].map((_, i) => ({
+    size: Math.random() * 3 + 2,
+    left: Math.random() * 100,
+    top: Math.random() * 100,
+    delay: Math.random() * 5,
+    duration: Math.random() * 6 + 5,
+    depth: 0.15 + (i % 6) * 0.18 // depth factor for 3D parallax layers!
+  })));
+
+  return (
+    <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden select-none">
+      {stars.current.map((star, i) => {
+        const starX = useTransform(springX, [-1, 1], [-35 * star.depth, 35 * star.depth]);
+        const starY = useTransform(springY, [-1, 1], [30 * star.depth, -30 * star.depth]);
+
+        return (
+          <motion.div
+            key={i}
+            className="absolute bg-primary-glow/40 rounded-full"
+            style={{
+              width: star.size,
+              height: star.size,
+              left: `${star.left}%`,
+              top: `${star.top}%`,
+              x: starX,
+              y: starY,
+              boxShadow: "0 0 6px rgba(0, 242, 254, 0.45)",
+            }}
+            animate={{
+              opacity: [0.15, 0.6, 0.15],
+              scale: [0.9, 1.2, 0.9],
+            }}
+            transition={{
+              duration: star.duration,
+              repeat: Infinity,
+              delay: star.delay,
+              ease: "easeInOut",
+            }}
+          />
+        );
+      })}
+    </div>
+  );
+};
+
+// --- FLOATING 2D BACKGROUND SHAPES ---
 interface Floating2DShapesProps {
   x: any;
   y: any;
@@ -94,40 +147,6 @@ const Floating2DShapes: React.FC<Floating2DShapesProps> = ({ x, y }) => {
           <circle cx="10" cy="10" r="3" fill="none" />
         </svg>
       </motion.div>
-      
-      {/* Drifting glowing ambient dust particles */}
-      <div className="absolute inset-0">
-        {[...Array(20)].map((_, i) => {
-          const size = Math.random() * 3 + 2;
-          const left = Math.random() * 100;
-          const top = Math.random() * 100;
-          const delay = Math.random() * 5;
-          const duration = Math.random() * 6 + 5;
-          return (
-            <motion.div
-              key={i}
-              className="absolute bg-primary-glow/40 rounded-full"
-              style={{
-                width: size,
-                height: size,
-                left: `${left}%`,
-                top: `${top}%`,
-                boxShadow: "0 0 6px rgba(0, 242, 254, 0.4)",
-              }}
-              animate={{
-                opacity: [0.15, 0.5, 0.15],
-                scale: [0.9, 1.2, 0.9],
-              }}
-              transition={{
-                duration,
-                repeat: Infinity,
-                delay,
-                ease: "easeInOut",
-              }}
-            />
-          );
-        })}
-      </div>
     </motion.div>
   );
 };
@@ -156,15 +175,28 @@ export const Hero3D: React.FC<Hero3DProps> = ({ lang }) => {
   const translateX = useTransform(springX, [-1, 1], [-15, 15]);
   const translateY = useTransform(springY, [-1, 1], [-15, 15]);
 
-  // Mouse move listener to update coordinates for 2D parallax reactivity
+  // Spotlight tracking
+  const rawX = useMotionValue(typeof window !== 'undefined' ? window.innerWidth / 2 : 500);
+  const rawY = useMotionValue(typeof window !== 'undefined' ? window.innerHeight / 2 : 500);
+
+  const rawSpringX = useSpring(rawX, { stiffness: 60, damping: 20 });
+  const rawSpringY = useSpring(rawY, { stiffness: 60, damping: 20 });
+
+  // Dynamic coordinates for backdrop radial gradient center
+  const glowX = useTransform(springX, [-1, 1], ['40%', '60%']);
+  const glowY = useTransform(springY, [-1, 1], ['60%', '40%']);
+
+  // Mouse move listener to update coordinates for 2D parallax reactivity & spotlight
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
       mouseX.set((e.clientX / window.innerWidth) * 2 - 1);
       mouseY.set(-(e.clientY / window.innerHeight) * 2 + 1);
+      rawX.set(e.clientX);
+      rawY.set(e.clientY);
     };
     window.addEventListener('mousemove', handleMouseMove);
     return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, [mouseX, mouseY]);
+  }, [mouseX, mouseY, rawX, rawY]);
 
   // Typewriter effect logic
   useEffect(() => {
@@ -206,14 +238,29 @@ export const Hero3D: React.FC<Hero3DProps> = ({ lang }) => {
     }
   };
 
+  // Dynamic gradient template tracking mouse coordinates with inertia
+  const spotlight = useMotionTemplate`radial-gradient(circle 350px at ${rawSpringX}px ${rawSpringY}px, rgba(0, 242, 254, 0.12) 0%, transparent 100%)`;
+  const bgGradient = useMotionTemplate`radial-gradient(circle at ${glowX} ${glowY}, rgba(13, 22, 41, 0.65) 0%, #070b13 100%)`;
+
   return (
     <section id="hero" className="relative min-h-screen w-full flex items-center justify-center overflow-hidden pt-24 bg-bgDark">
+      {/* 2D Star Field with dynamic parallax layers */}
+      <StarField springX={springX} springY={springY} />
+
       {/* 2D Animated Constellation Backdrop */}
       <Floating2DShapes x={translateX} y={translateY} />
 
-      {/* Aurora Radial Backdrop */}
-      <div className="absolute inset-0 bg-radial pointer-events-none z-0 opacity-40 mix-blend-screen" 
-           style={{ background: 'radial-gradient(circle at center, rgba(13, 22, 41, 0.45) 0%, #070b13 100%)' }} />
+      {/* Aurora Radial Backdrop following the cursor */}
+      <motion.div 
+        className="absolute inset-0 pointer-events-none z-0 opacity-55 mix-blend-screen" 
+        style={{ background: bgGradient }} 
+      />
+
+      {/* Cursor Spotlight Ring */}
+      <motion.div 
+        className="absolute inset-0 pointer-events-none z-0" 
+        style={{ background: spotlight }} 
+      />
 
       <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-12 gap-12 items-center relative z-10 w-full">
         {/* Left: Interactive Details */}

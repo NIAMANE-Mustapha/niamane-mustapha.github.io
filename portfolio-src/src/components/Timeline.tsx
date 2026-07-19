@@ -27,7 +27,7 @@ export const Timeline: React.FC<TimelineProps> = ({ lang }) => {
       id: 1,
       date: t['exp-job1-date'],
       title: t['exp-job1-title'],
-      company: 'InnovQube (Paris / Remote)',
+      company: 'InnovQube (Paris)',
       desc: t['exp-job1-desc'],
       side: 'left'
     },
@@ -35,7 +35,7 @@ export const Timeline: React.FC<TimelineProps> = ({ lang }) => {
       id: 2,
       date: t['exp-job2-date'],
       title: t['exp-job2-title'],
-      company: 'ERAH (Casablanca)',
+      company: 'ERAH (Paris)',
       desc: t['exp-job2-desc'],
       side: 'right'
     },
@@ -75,9 +75,8 @@ export const Timeline: React.FC<TimelineProps> = ({ lang }) => {
           {timelineItems.map((item, idx) => (
             <div
               key={item.id}
-              className={`flex flex-col md:flex-row items-center justify-between relative ${
-                item.side === 'right' ? 'md:flex-row-reverse' : ''
-              }`}
+              className={`flex flex-col md:flex-row items-center justify-between relative ${item.side === 'right' ? 'md:flex-row-reverse' : ''
+                }`}
             >
               {/* Desktop Center Connector Dot */}
               <div className="absolute left-1/2 top-[30px] transform -translate-x-1/2 w-4 h-4 rounded-full bg-bgDark border-2 border-primary-glow z-10 hidden md:block shadow-[0_0_8px_var(--primary-glow)] hover:scale-125 transition-transform" />
@@ -110,7 +109,7 @@ export const Timeline: React.FC<TimelineProps> = ({ lang }) => {
                   </h4>
 
                   {/* Description */}
-                  <p 
+                  <p
                     className="text-textMuted text-sm sm:text-base leading-relaxed"
                     dangerouslySetInnerHTML={{ __html: item.desc }}
                   />
